@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>BUBBLYR</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  </head>
+  <body>
+    <div class="shell">
+      <header class="topbar">
+        <div>
+          <p class="kicker">Anonymous local alpha, sadly useful</p>
+          <h1>BUBBLYR</h1>
+          <p class="subbrand">local signal, anonymous first</p>
+        </div>
+        <div class="identity">
+          <span class="status-dot"></span>
+          <span id="guestName">Guest</span>
+        </div>
+      </header>
+
+      <main class="layout">
+        <section class="map-panel" aria-label="Nearby map">
+          <div id="map"></div>
+          <div id="locationGate" class="location-gate">
+            <p class="kicker">VC Buddy PM Requirement #1</p>
+            <h2>Share approximate location</h2>
+            <p>We only need it to prove you are near the chaos. Calm down, this is not an adtech retargeting funnel.</p>
+            <div class="location-actions">
+              <button id="enableLocation">Use my location</button>
+              <button id="demoLocation" class="secondary-button">Try SF demo spot</button>
+            </div>
+          </div>
+          <button id="createButton" class="create-button" aria-label="Create bubble">+</button>
+        </section>
+
+        <section class="side-panel">
+          <div class="filters" id="filters">
+            <button class="filter active" data-category="All">All</button>
+            {% for key, category in categories.items() %}
+            <button class="filter" data-category="{{ key }}">{{ category.label }}</button>
+            {% endfor %}
+          </div>
+
+          <div class="pulse">
+            <div>
+              <p class="kicker">Board-facing local pulse</p>
+              <h2 id="pulseTitle">Waiting for location</h2>
+            </div>
+            <p id="pulseText">Create or join a bubble to answer the ancient civic question: why is everyone standing around confused?</p>
+            <div class="pulse-actions">
+              <button id="seedDemo" class="secondary-button" type="button">Seed demo bubbles</button>
+              <button id="recenterMap" class="secondary-button" type="button">Recenter</button>
+            </div>
+          </div>
+
+          <div class="idea-strip">
+            <span>Train rugged?</span>
+            <span>Smoke or Series B?</span>
+            <span>Earth shipped?</span>
+            <span>Roadmap accident?</span>
+            <span>Queue with TAM?</span>
+          </div>
+
+          <div id="bubbleList" class="bubble-list"></div>
+        </section>
+      </main>
+    </div>
+
+    <dialog id="createDialog" class="modal">
+      <form id="createForm" method="dialog">
+        <div class="modal-head">
+          <div>
+            <p class="kicker">Create geo-social liquidity</p>
+            <h2>Ask the people who can actually see it</h2>
+          </div>
+          <button type="button" class="icon-button" id="closeCreate">x</button>
+        </div>
+
+        <label>
+          Category
+          <select id="categoryInput" required>
+            {% for key, category in categories.items() %}
+            <option value="{{ key }}">{{ category.label }} - {{ category.prompt }}</option>
+            {% endfor %}
+          </select>
+        </label>
+
+        <label>
+          Question
+          <input id="titleInput" maxlength="80" placeholder="Why is Caltrain doing performance art?" required>
+        </label>
+
+        <label>
+          Context
+          <textarea id="descriptionInput" maxlength="220" rows="3" placeholder="Platform 4, everyone waiting, one guy in Allbirds says it is signal failure"></textarea>
+        </label>
+
+        <label>
+          Radius <strong><span id="radiusValue">600</span>m</strong>
+          <input id="radiusInput" type="range" min="100" max="2000" step="100" value="600">
+        </label>
+
+        <button class="primary" type="submit">Ship the bubble</button>
+      </form>
+    </dialog>
+
+    <dialog id="chatDialog" class="chat-modal">
+      <div class="chat-shell">
+        <header class="chat-head">
+          <button type="button" class="icon-button" id="closeChat">‹</button>
+          <div>
+            <p class="kicker" id="chatMeta">Bubble</p>
+            <h2 id="chatTitle">Local due diligence</h2>
+          </div>
+          <div class="vote-box">
+            <button type="button" id="bubbleUp">▲</button>
+            <strong id="bubbleScore">0</strong>
+            <button type="button" id="bubbleDown">▼</button>
+          </div>
+        </header>
+
+        <div id="chatMessages" class="messages"></div>
+
+        <form id="messageForm" class="message-form">
+          <input id="messageInput" maxlength="400" placeholder="What do your human eyes report?">
+          <button type="submit">Post signal</button>
+        </form>
+      </div>
+    </dialog>
+
+    <div id="toast" class="toast" role="status"></div>
+
+    <script>
+      window.PROXMUNITY_CATEGORIES = {{ categories | tojson }};
+    </script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+  </body>
+</html>
