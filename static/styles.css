@@ -498,10 +498,14 @@ textarea {
 .chat-modal {
   width: min(760px, 100vw);
   height: min(820px, 100vh);
+  max-height: 100vh;
+  overflow: hidden;
 }
 
 .chat-shell {
   height: 100%;
+  max-height: min(820px, 100vh);
+  min-height: 0;
   background: #fff;
   display: flex;
   flex-direction: column;
@@ -579,6 +583,7 @@ textarea {
 .chat-head {
   padding: 12px;
   border-bottom: 1px solid var(--line);
+  flex: 0 0 auto;
 }
 
 .chat-head > div:nth-child(2) {
@@ -610,7 +615,9 @@ textarea {
 
 .messages {
   flex: 1;
-  overflow: auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
   padding: 16px;
   display: flex;
   flex-direction: column;
@@ -666,6 +673,7 @@ textarea {
 }
 
 .message-form {
+  flex: 0 0 auto;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 8px;
@@ -799,6 +807,8 @@ textarea {
   }
 
   .chat-shell {
+    height: 100vh;
+    max-height: 100vh;
     border-radius: 0;
   }
 
