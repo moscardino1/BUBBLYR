@@ -268,7 +268,8 @@ def create_app() -> Flask:
                 return jsonify({"error": "Bubble not found."}), 404
 
             distance = haversine_meters(lat, lng, bubble["lat"], bubble["lng"])
-            if distance > bubble["radius_meters"] + 75:
+            is_creator = bubble["creator_token"] == session["guest_token"]
+            if not is_creator and distance > bubble["radius_meters"] + 75:
                 return jsonify({"error": "You are outside this bubble."}), 403
 
             last = (
@@ -428,6 +429,8 @@ def serialize_bubble(
         if has_viewer_location
         else None
     )
+    is_creator = bubble["creator_token"] == session["guest_token"]
+    can_post = is_creator or bool(distance is not None and distance <= bubble["radius_meters"] + 75)
     payload = {
         "id": bubble["id"],
         "title": bubble["title"],
@@ -437,7 +440,7 @@ def serialize_bubble(
         "created_at": bubble["created_at"],
         "last_active": bubble["last_active"],
         "distance_meters": round(distance) if distance is not None else None,
-        "can_post": bool(distance is not None and distance <= bubble["radius_meters"] + 75),
+        "can_post": can_post,
         "message_count": len(message_rows),
         "score": vote_score(conn, "bubble", bubble["id"]),
         "lat": blur_coord(bubble["lat"], 3),
