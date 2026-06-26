@@ -57,6 +57,7 @@
             </div>
             <p id="pulseText">Create or join a bubble to understand what is happening nearby.</p>
             <div class="pulse-actions">
+              <button id="createFromPanel" class="primary small-action" type="button">Create bubble</button>
               <button id="exitDemo" class="secondary-button hidden" type="button">Exit demo</button>
               <button id="recenterMap" class="secondary-button" type="button">Recenter</button>
             </div>
@@ -113,6 +114,11 @@
         <button class="primary" type="submit">Create bubble</button>
       </form>
     </dialog>
+
+    <div id="radiusBadge" class="radius-badge hidden">
+      <span>Bubble radius</span>
+      <strong><span id="radiusBadgeValue">600</span>m</strong>
+    </div>
 
     <dialog id="chatDialog" class="chat-modal">
       <div class="chat-shell">

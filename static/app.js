@@ -26,6 +26,7 @@ const els = {
   demoLocation: document.querySelector("#demoLocation"),
   exitDemo: document.querySelector("#exitDemo"),
   recenterMap: document.querySelector("#recenterMap"),
+  createFromPanel: document.querySelector("#createFromPanel"),
   locationGate: document.querySelector("#locationGate"),
   createButton: document.querySelector("#createButton"),
   createDialog: document.querySelector("#createDialog"),
@@ -36,6 +37,8 @@ const els = {
   descriptionInput: document.querySelector("#descriptionInput"),
   radiusInput: document.querySelector("#radiusInput"),
   radiusValue: document.querySelector("#radiusValue"),
+  radiusBadge: document.querySelector("#radiusBadge"),
+  radiusBadgeValue: document.querySelector("#radiusBadgeValue"),
   bubbleList: document.querySelector("#bubbleList"),
   pulseTitle: document.querySelector("#pulseTitle"),
   pulseText: document.querySelector("#pulseText"),
@@ -95,19 +98,13 @@ function bindEvents() {
     }
     state.map.setView([state.coords.lat, state.coords.lng], 15);
   });
-  els.createButton.addEventListener("click", () => {
-    if (!state.coords) {
-      toast("Turn on location first.");
-      return;
-    }
-    els.createDialog.showModal();
-    showRadiusPreview();
-    els.titleInput.focus();
-  });
+  els.createButton.addEventListener("click", openCreateDialog);
+  els.createFromPanel.addEventListener("click", openCreateDialog);
   els.closeCreate.addEventListener("click", closeCreateDialog);
   els.createDialog.addEventListener("close", hideRadiusPreview);
   els.radiusInput.addEventListener("input", () => {
     els.radiusValue.textContent = els.radiusInput.value;
+    els.radiusBadgeValue.textContent = els.radiusInput.value;
     updateRadiusPreview();
   });
   els.createForm.addEventListener("submit", createBubble);
@@ -123,6 +120,16 @@ function bindEvents() {
   els.messageForm.addEventListener("submit", sendMessage);
   els.bubbleUp.addEventListener("click", () => voteBubble("up"));
   els.bubbleDown.addEventListener("click", () => voteBubble("down"));
+}
+
+function openCreateDialog() {
+    if (!state.coords) {
+      toast("Share location before creating a bubble.");
+      return;
+    }
+    els.createDialog.showModal();
+    showRadiusPreview();
+    els.titleInput.focus();
 }
 
 function hideDemoIfSeen() {
@@ -234,11 +241,9 @@ function showRadiusPreview() {
       interactive: false,
     }).addTo(state.map);
   }
+  els.radiusBadgeValue.textContent = els.radiusInput.value;
+  els.radiusBadge.classList.remove("hidden");
   updateRadiusPreview();
-  state.map.fitBounds(state.radiusPreview.getBounds(), {
-    padding: [28, 28],
-    maxZoom: 16,
-  });
 }
 
 function updateRadiusPreview() {
@@ -249,6 +254,7 @@ function updateRadiusPreview() {
 }
 
 function hideRadiusPreview() {
+  els.radiusBadge.classList.add("hidden");
   if (!state.radiusPreview) return;
   state.radiusPreview.remove();
   state.radiusPreview = null;
@@ -350,9 +356,9 @@ function renderBubbles() {
 
 function renderMarkers() {
   const ids = new Set(state.bubbles.map((bubble) => bubble.id));
-  for (const [id, marker] of state.markers.entries()) {
+  for (const [id, entry] of state.markers.entries()) {
     if (!ids.has(id)) {
-      marker.remove();
+      entry.group.remove();
       state.markers.delete(id);
     }
   }
@@ -361,29 +367,49 @@ function renderMarkers() {
     const category = window.BUBBLYR_CATEGORIES[bubble.category] || window.BUBBLYR_CATEGORIES.General;
     const isSelected = state.selectedBubbleId === bubble.id;
     if (state.markers.has(bubble.id)) {
-      const marker = state.markers.get(bubble.id);
-      marker.setLatLng([bubble.lat, bubble.lng]);
-      marker.setStyle(markerStyle(category.color, bubble.message_count, isSelected));
-      marker.bindTooltip(bubble.title, { direction: "top", offset: [0, -8] });
+      const entry = state.markers.get(bubble.id);
+      entry.aura.setLatLng([bubble.lat, bubble.lng]);
+      entry.aura.setRadius(bubble.radius_meters);
+      entry.aura.setStyle(auraStyle(category.color, isSelected));
+      entry.pip.setLatLng([bubble.lat, bubble.lng]);
+      entry.pip.setStyle(markerStyle(category.color, bubble.message_count, isSelected));
+      entry.pip.bindTooltip(bubble.title, { direction: "top", offset: [0, -8] });
       return;
     }
 
-    const marker = L.circleMarker(
+    const group = L.layerGroup().addTo(state.map);
+    const aura = L.circle([bubble.lat, bubble.lng], {
+      ...auraStyle(category.color, isSelected),
+      radius: bubble.radius_meters,
+    }).addTo(group);
+    const pip = L.circleMarker(
       [bubble.lat, bubble.lng],
       markerStyle(category.color, bubble.message_count, isSelected),
-    ).addTo(state.map);
-    marker.bindTooltip(bubble.title, { direction: "top", offset: [0, -8] });
-    marker.on("click", () => focusBubble(bubble.id, true));
-    marker.on("dblclick", () => openChat(bubble.id));
-    state.markers.set(bubble.id, marker);
+    ).addTo(group);
+    pip.bindTooltip(bubble.title, { direction: "top", offset: [0, -8] });
+    aura.on("click", () => focusBubble(bubble.id, true));
+    pip.on("click", () => focusBubble(bubble.id, true));
+    pip.on("dblclick", () => openChat(bubble.id));
+    state.markers.set(bubble.id, { group, aura, pip });
   });
 }
 
 function clearMarkers() {
-  for (const marker of state.markers.values()) {
-    marker.remove();
+  for (const entry of state.markers.values()) {
+    entry.group.remove();
   }
   state.markers.clear();
+}
+
+function auraStyle(color, selected) {
+  return {
+    color,
+    fillColor: color,
+    fillOpacity: selected ? 0.16 : 0.08,
+    opacity: selected ? 0.95 : 0.45,
+    weight: selected ? 3 : 1,
+    interactive: true,
+  };
 }
 
 function markerStyle(color, messageCount, selected) {
@@ -401,8 +427,8 @@ function focusBubble(id, fromMap = false) {
   if (!bubble) return;
   state.selectedBubbleId = id;
   state.map.setView([bubble.lat, bubble.lng], Math.max(state.map.getZoom(), 16));
-  const marker = state.markers.get(id);
-  if (marker) marker.openTooltip();
+  const entry = state.markers.get(id);
+  if (entry) entry.pip.openTooltip();
   renderBubbles();
   renderMarkers();
   if (fromMap) toast("Bubble selected. Double-click marker or use Open chat.");
