@@ -15,9 +15,12 @@
           <h1>BUBBLYR</h1>
           <p class="subbrand">local signal, anonymous first</p>
         </div>
-        <div class="identity">
-          <span class="status-dot"></span>
-          <span id="guestName">Guest</span>
+        <div class="top-actions">
+          <button id="openManifesto" class="text-button" type="button">Manifesto</button>
+          <div class="identity">
+            <span class="status-dot"></span>
+            <span id="guestName">Guest</span>
+          </div>
         </div>
       </header>
 
@@ -129,6 +132,58 @@
           <button type="submit">Send</button>
         </form>
       </div>
+    </dialog>
+
+    <dialog id="manifestoDialog" class="manifesto-modal">
+      <article class="manifesto">
+        <header class="manifesto-head">
+          <div>
+            <p class="kicker">The BUBBLYR manifesto</p>
+            <h2>News should start where reality happens.</h2>
+          </div>
+          <button type="button" class="icon-button" id="closeManifesto">x</button>
+        </header>
+
+        <div class="manifesto-body">
+          <p class="lead">
+            BUBBLYR is an experiment in local, anonymous, real-time news: people on the ground create bubbles around what they see, ask what is happening, and compare signals with others nearby.
+          </p>
+
+          <section>
+            <h3>The old model is backwards</h3>
+            <p>
+              News usually arrives after an event has already been filtered through platforms, feeds, institutions, incentives, and delay. But the first version of reality is often simpler: people standing near the thing, trying to understand it together.
+            </p>
+          </section>
+
+          <section>
+            <h3>The new layer is participatory</h3>
+            <p>
+              A blocked train, a fire, an earthquake, a crowd, a power cut, a road closure. These are not abstract stories at first. They are local questions. BUBBLYR lets people create the event before a headline exists.
+            </p>
+          </section>
+
+          <section>
+            <h3>AI comes later</h3>
+            <p>
+              The future idea is an AI news layer running in parallel: summarizing active bubbles, grouping related reports, highlighting uncertainty, and turning many anonymous local observations into a clear public brief.
+            </p>
+            <p>
+              That layer is not in this free MVP yet. For now, BUBBLYR is the human signal layer: chat, proximity, voting, and ephemeral local context.
+            </p>
+          </section>
+
+          <section>
+            <h3>Principles</h3>
+            <ul>
+              <li>Anonymous first, because reporting what you see should not require a personal brand.</li>
+              <li>Local first, because proximity changes what you can know.</li>
+              <li>Ephemeral by default, because not every local event deserves permanent storage.</li>
+              <li>AI as editor, not witness: humans create the signal; machines may later summarize it.</li>
+            </ul>
+          </section>
+        </div>
+      </article>
     </dialog>
 
     <div id="toast" class="toast" role="status"></div>

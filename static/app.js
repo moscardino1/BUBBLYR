@@ -18,6 +18,9 @@ const state = {
 
 const els = {
   guestName: document.querySelector("#guestName"),
+  openManifesto: document.querySelector("#openManifesto"),
+  closeManifesto: document.querySelector("#closeManifesto"),
+  manifestoDialog: document.querySelector("#manifestoDialog"),
   enableLocation: document.querySelector("#enableLocation"),
   demoLocation: document.querySelector("#demoLocation"),
   exitDemo: document.querySelector("#exitDemo"),
@@ -74,6 +77,8 @@ function initMap() {
 }
 
 function bindEvents() {
+  els.openManifesto.addEventListener("click", () => els.manifestoDialog.showModal());
+  els.closeManifesto.addEventListener("click", () => els.manifestoDialog.close());
   els.enableLocation.addEventListener("click", requestLocation);
   els.demoLocation.addEventListener("click", startDemoMode);
   els.exitDemo.addEventListener("click", exitDemoMode);

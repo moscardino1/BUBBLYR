@@ -97,6 +97,22 @@ h1 {
   white-space: nowrap;
 }
 
+.top-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.text-button {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink);
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 850;
+}
+
 .status-dot {
   width: 9px;
   height: 9px;
@@ -343,14 +359,16 @@ h1 {
 }
 
 .modal,
-.chat-modal {
+.chat-modal,
+.manifesto-modal {
   border: 0;
   padding: 0;
   background: transparent;
 }
 
 .modal::backdrop,
-.chat-modal::backdrop {
+.chat-modal::backdrop,
+.manifesto-modal::backdrop {
   background: rgba(16, 24, 40, 0.48);
 }
 
@@ -417,6 +435,72 @@ textarea {
   border-radius: 18px;
   overflow: hidden;
   box-shadow: var(--shadow);
+}
+
+.manifesto-modal {
+  width: min(760px, calc(100vw - 24px));
+}
+
+.manifesto {
+  max-height: min(820px, calc(100vh - 24px));
+  overflow: auto;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+}
+
+.manifesto-head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 22px;
+  background: rgba(255, 255, 255, 0.94);
+  border-bottom: 1px solid var(--line);
+  backdrop-filter: blur(16px);
+}
+
+.manifesto-head h2 {
+  margin-top: 4px;
+  max-width: 560px;
+  font-size: 30px;
+  line-height: 1.1;
+}
+
+.manifesto-body {
+  display: grid;
+  gap: 22px;
+  padding: 24px;
+}
+
+.manifesto-body .lead {
+  color: var(--ink);
+  font-size: 18px;
+  line-height: 1.55;
+}
+
+.manifesto-body section {
+  display: grid;
+  gap: 8px;
+}
+
+.manifesto-body h3 {
+  margin: 0;
+  font-size: 17px;
+}
+
+.manifesto-body p,
+.manifesto-body li {
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.manifesto-body ul {
+  margin: 0;
+  padding-left: 20px;
 }
 
 .chat-head {
@@ -584,6 +668,10 @@ textarea {
     text-overflow: ellipsis;
   }
 
+  .text-button {
+    padding: 8px 10px;
+  }
+
   .location-gate {
     left: 12px;
     top: 12px;
@@ -599,5 +687,19 @@ textarea {
 
   .chat-shell {
     border-radius: 0;
+  }
+
+  .manifesto-modal {
+    width: 100vw;
+    max-width: 100vw;
+  }
+
+  .manifesto {
+    max-height: 100vh;
+    border-radius: 0;
+  }
+
+  .manifesto-head h2 {
+    font-size: 24px;
   }
 }
