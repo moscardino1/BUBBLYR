@@ -108,7 +108,7 @@
         <label>
           Radius <strong><span id="radiusValue">600</span>m</strong>
           <input id="radiusInput" type="range" min="100" max="2000" step="100" value="600">
-          <span class="field-hint">The map shows who will be close enough to read and reply.</span>
+          <span class="field-hint">Drag the bubble pin or click the map to choose the exact event location.</span>
         </label>
 
         <button class="primary" type="submit">Create bubble</button>
@@ -116,8 +116,9 @@
     </dialog>
 
     <div id="radiusBadge" class="radius-badge hidden">
-      <span>Bubble radius</span>
+      <span>Bubble pin + radius</span>
       <strong><span id="radiusBadgeValue">600</span>m</strong>
+      <small>Drag pin or click map</small>
     </div>
 
     <dialog id="chatDialog" class="chat-modal">

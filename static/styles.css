@@ -256,6 +256,36 @@ h1 {
   line-height: 1;
 }
 
+.radius-badge small {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.create-pin {
+  background: transparent;
+  border: 0;
+}
+
+.create-pin-inner {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  border: 4px solid #fff;
+  border-radius: 50% 50% 50% 4px;
+  background: var(--accent);
+  box-shadow: 0 12px 24px rgba(16, 24, 40, 0.24);
+  transform: rotate(-45deg);
+}
+
+.create-pin-inner::after {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border-radius: 50%;
+  background: #fff;
+}
+
 .side-panel {
   border-left: 1px solid var(--line);
   background: rgba(255, 255, 255, 0.92);

@@ -13,6 +13,8 @@ const state = {
   userMarker: null,
   userCircle: null,
   radiusPreview: null,
+  createPin: null,
+  createCoords: null,
   markers: new Map(),
   refreshTimer: null,
 };
@@ -215,7 +217,7 @@ function updateUserMarker() {
   } else {
     state.userMarker.setLatLng(latLng);
     state.userCircle.setLatLng(latLng);
-    if (state.radiusPreview) {
+    if (state.radiusPreview && !state.createCoords) {
       state.radiusPreview.setLatLng(latLng);
     }
     state.map.setView(latLng, Math.max(state.map.getZoom(), 15));
@@ -229,7 +231,8 @@ function closeCreateDialog() {
 
 function showRadiusPreview() {
   if (!state.coords) return;
-  const latLng = [state.coords.lat, state.coords.lng];
+  state.createCoords = { ...state.coords };
+  const latLng = [state.createCoords.lat, state.createCoords.lng];
   if (!state.radiusPreview) {
     state.radiusPreview = L.circle(latLng, {
       radius: Number(els.radiusInput.value),
@@ -241,23 +244,62 @@ function showRadiusPreview() {
       interactive: false,
     }).addTo(state.map);
   }
+  if (!state.createPin) {
+    state.createPin = L.marker(latLng, {
+      draggable: true,
+      icon: L.divIcon({
+        className: "create-pin",
+        html: `<div class="create-pin-inner"></div>`,
+        iconSize: [34, 42],
+        iconAnchor: [17, 40],
+      }),
+    }).addTo(state.map);
+    state.createPin.on("drag", () => {
+      const pos = state.createPin.getLatLng();
+      setCreateCoords(pos.lat, pos.lng);
+    });
+    state.createPin.on("dragend", () => toast("Bubble pin moved."));
+  }
+  state.map.on("click", handleCreateMapClick);
   els.radiusBadgeValue.textContent = els.radiusInput.value;
   els.radiusBadge.classList.remove("hidden");
   updateRadiusPreview();
+  toast("Drag the bubble pin or click the map to choose the event spot.");
 }
 
 function updateRadiusPreview() {
-  if (!state.coords || !state.radiusPreview) return;
+  if (!state.createCoords || !state.radiusPreview) return;
   state.radiusPreview
-    .setLatLng([state.coords.lat, state.coords.lng])
+    .setLatLng([state.createCoords.lat, state.createCoords.lng])
     .setRadius(Number(els.radiusInput.value));
+  if (state.createPin) {
+    state.createPin.setLatLng([state.createCoords.lat, state.createCoords.lng]);
+  }
 }
 
 function hideRadiusPreview() {
   els.radiusBadge.classList.add("hidden");
-  if (!state.radiusPreview) return;
-  state.radiusPreview.remove();
-  state.radiusPreview = null;
+  state.map.off("click", handleCreateMapClick);
+  if (state.radiusPreview) {
+    state.radiusPreview.remove();
+    state.radiusPreview = null;
+  }
+  if (state.createPin) {
+    state.createPin.remove();
+    state.createPin = null;
+  }
+  state.createCoords = null;
+}
+
+function handleCreateMapClick(event) {
+  if (!els.createDialog.open) return;
+  setCreateCoords(event.latlng.lat, event.latlng.lng);
+  toast("Bubble pin moved.");
+}
+
+function setCreateCoords(lat, lng) {
+  state.createCoords = { lat, lng };
+  updateRadiusPreview();
 }
 
 async function refreshBubbles() {
@@ -445,8 +487,8 @@ async function createBubble(event) {
     description: els.descriptionInput.value,
     category: els.categoryInput.value,
     radius_meters: Number(els.radiusInput.value),
-    lat: state.coords.lat,
-    lng: state.coords.lng,
+    lat: (state.createCoords || state.coords).lat,
+    lng: (state.createCoords || state.coords).lng,
   };
 
   let bubble;
