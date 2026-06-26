@@ -231,6 +231,7 @@ h1 {
 .create-pin {
   background: transparent;
   border: 0;
+  position: relative;
 }
 
 .create-pin-label {
@@ -431,21 +432,96 @@ h1 {
 }
 
 .create-panel {
-  position: absolute;
+  position: fixed;
   left: 24px;
   bottom: 24px;
-  z-index: 1200;
-  width: min(420px, calc(100vw - 48px));
+  z-index: 1800;
+  width: min(460px, calc(100vw - 48px));
 }
 
-.create-panel form {
-  width: min(520px, calc(100vw - 24px));
+.create-form {
+  width: 100%;
+  max-height: min(720px, calc(100vh - 48px));
+  overflow: auto;
   background: #fff;
   border-radius: 18px;
   padding: 20px;
   display: grid;
-  gap: 14px;
+  gap: 12px;
   box-shadow: var(--shadow);
+}
+
+.sheet-handle {
+  display: none;
+}
+
+.create-head {
+  align-items: flex-start;
+}
+
+.create-head h2 {
+  margin-top: 2px;
+  font-size: 24px;
+  line-height: 1.1;
+}
+
+.create-helper {
+  margin-top: 7px;
+  color: var(--muted);
+  line-height: 1.35;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.create-step {
+  display: grid;
+  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 12px;
+  background: #f9fafb;
+}
+
+.write-step {
+  border-color: rgba(15, 118, 110, 0.24);
+  background: #f0fdfa;
+}
+
+.create-step-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink);
+}
+
+.create-step-title span {
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  display: inline-grid;
+  place-items: center;
+  background: var(--ink);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 900;
+  flex: 0 0 auto;
+}
+
+.create-step-title strong {
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.place-step p {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+.create-submit {
+  width: 100%;
+  min-height: 48px;
 }
 
 .modal-head,
@@ -781,17 +857,37 @@ textarea {
     width: 100%;
   }
 
-  .create-panel form {
+  .create-form {
     width: 100%;
-    max-height: 48vh;
+    max-height: 66vh;
     overflow: auto;
     border-radius: 18px 18px 0 0;
-    padding: 14px;
+    padding: 10px 14px 14px;
     gap: 10px;
+  }
+
+  .sheet-handle {
+    justify-self: center;
+    display: block;
+    width: 46px;
+    height: 5px;
+    border-radius: 999px;
+    background: #d0d5dd;
+    margin-bottom: 2px;
   }
 
   .create-panel .modal-head h2 {
     font-size: 18px;
+  }
+
+  .create-helper,
+  .place-step p {
+    font-size: 12px;
+  }
+
+  .create-step {
+    padding: 10px;
+    gap: 8px;
   }
 
   .create-panel textarea {

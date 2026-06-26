@@ -77,41 +77,56 @@
     </div>
 
     <section id="createDialog" class="create-panel hidden" aria-label="Create bubble panel">
-      <form id="createForm">
-        <div class="modal-head">
+      <form id="createForm" class="create-form">
+        <div class="sheet-handle" aria-hidden="true"></div>
+        <div class="modal-head create-head">
           <div>
-            <p class="kicker">Start a bubble</p>
-            <h2>Ask people nearby</h2>
+            <p class="kicker">Create bubble</p>
+            <h2>Write what is happening</h2>
+            <p class="create-helper">Post one clear local question. Then move the pin if the event is not exactly where you are.</p>
           </div>
           <button type="button" class="icon-button" id="closeCreate">x</button>
         </div>
 
-        <label>
-          Category
-          <select id="categoryInput" required>
-            {% for key, category in categories.items() %}
-            <option value="{{ key }}">{{ category.label }} - {{ category.prompt }}</option>
-            {% endfor %}
-          </select>
-        </label>
+        <div class="create-step write-step">
+          <div class="create-step-title">
+            <span>1</span>
+            <strong>Write the bubble</strong>
+          </div>
 
-        <label>
-          Question
-          <input id="titleInput" maxlength="80" placeholder="Why is the train stopped?" required>
-        </label>
+          <label>
+            Question people will see
+            <input id="titleInput" maxlength="80" placeholder="Why is the train stopped?" required>
+          </label>
 
-        <label>
-          Context
-          <textarea id="descriptionInput" maxlength="220" rows="3" placeholder="Platform 4, no announcement yet"></textarea>
-        </label>
+          <label>
+            Context
+            <textarea id="descriptionInput" maxlength="220" rows="3" placeholder="Platform 4, no announcement yet"></textarea>
+          </label>
 
-        <label>
-          Radius <strong><span id="radiusValue">600</span>m</strong>
-          <input id="radiusInput" type="range" min="100" max="2000" step="100" value="600">
-          <span class="field-hint">Drag the bubble pin or click the map to choose the exact event location.</span>
-        </label>
+          <label>
+            Category
+            <select id="categoryInput" required>
+              {% for key, category in categories.items() %}
+              <option value="{{ key }}">{{ category.label }} - {{ category.prompt }}</option>
+              {% endfor %}
+            </select>
+          </label>
+        </div>
 
-        <button class="primary" type="submit">Create bubble</button>
+        <div class="create-step place-step">
+          <div class="create-step-title">
+            <span>2</span>
+            <strong>Place it on the map</strong>
+          </div>
+          <p>Drag the "Bubble here" pin or tap the map. The circle shows who can reply.</p>
+          <label>
+            Reply radius <strong><span id="radiusValue">600</span>m</strong>
+            <input id="radiusInput" type="range" min="100" max="2000" step="100" value="600">
+          </label>
+        </div>
+
+        <button class="primary create-submit" type="submit">Create bubble</button>
       </form>
     </section>
 
