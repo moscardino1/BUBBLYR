@@ -12,6 +12,7 @@ const state = {
   map: null,
   userMarker: null,
   userCircle: null,
+  radiusPreview: null,
   markers: new Map(),
   refreshTimer: null,
 };
@@ -100,11 +101,14 @@ function bindEvents() {
       return;
     }
     els.createDialog.showModal();
+    showRadiusPreview();
     els.titleInput.focus();
   });
-  els.closeCreate.addEventListener("click", () => els.createDialog.close());
+  els.closeCreate.addEventListener("click", closeCreateDialog);
+  els.createDialog.addEventListener("close", hideRadiusPreview);
   els.radiusInput.addEventListener("input", () => {
     els.radiusValue.textContent = els.radiusInput.value;
+    updateRadiusPreview();
   });
   els.createForm.addEventListener("submit", createBubble);
   els.filters.addEventListener("click", (event) => {
@@ -204,8 +208,50 @@ function updateUserMarker() {
   } else {
     state.userMarker.setLatLng(latLng);
     state.userCircle.setLatLng(latLng);
+    if (state.radiusPreview) {
+      state.radiusPreview.setLatLng(latLng);
+    }
     state.map.setView(latLng, Math.max(state.map.getZoom(), 15));
   }
+}
+
+function closeCreateDialog() {
+  els.createDialog.close();
+  hideRadiusPreview();
+}
+
+function showRadiusPreview() {
+  if (!state.coords) return;
+  const latLng = [state.coords.lat, state.coords.lng];
+  if (!state.radiusPreview) {
+    state.radiusPreview = L.circle(latLng, {
+      radius: Number(els.radiusInput.value),
+      color: "#0f766e",
+      fillColor: "#0f766e",
+      fillOpacity: 0.13,
+      weight: 2,
+      dashArray: "8 8",
+      interactive: false,
+    }).addTo(state.map);
+  }
+  updateRadiusPreview();
+  state.map.fitBounds(state.radiusPreview.getBounds(), {
+    padding: [28, 28],
+    maxZoom: 16,
+  });
+}
+
+function updateRadiusPreview() {
+  if (!state.coords || !state.radiusPreview) return;
+  state.radiusPreview
+    .setLatLng([state.coords.lat, state.coords.lng])
+    .setRadius(Number(els.radiusInput.value));
+}
+
+function hideRadiusPreview() {
+  if (!state.radiusPreview) return;
+  state.radiusPreview.remove();
+  state.radiusPreview = null;
 }
 
 async function refreshBubbles() {
@@ -391,7 +437,7 @@ async function createBubble(event) {
   els.createForm.reset();
   els.radiusInput.value = 600;
   els.radiusValue.textContent = "600";
-  els.createDialog.close();
+  closeCreateDialog();
   await refreshBubbles();
   openChat(bubble.id);
 }

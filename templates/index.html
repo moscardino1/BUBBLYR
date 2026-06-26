@@ -36,7 +36,10 @@
               <button id="demoLocation" class="secondary-button">Preview demo</button>
             </div>
           </div>
-          <button id="createButton" class="create-button" aria-label="Create bubble">+</button>
+          <button id="createButton" class="create-button" aria-label="Create bubble">
+            <span>+</span>
+            <strong>Create bubble</strong>
+          </button>
         </section>
 
         <section class="side-panel">
@@ -104,6 +107,7 @@
         <label>
           Radius <strong><span id="radiusValue">600</span>m</strong>
           <input id="radiusInput" type="range" min="100" max="2000" step="100" value="600">
+          <span class="field-hint">The map shows who will be close enough to read and reply.</span>
         </label>
 
         <button class="primary" type="submit">Create bubble</button>
