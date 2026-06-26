@@ -39,8 +39,6 @@ const els = {
   descriptionInput: document.querySelector("#descriptionInput"),
   radiusInput: document.querySelector("#radiusInput"),
   radiusValue: document.querySelector("#radiusValue"),
-  radiusBadge: document.querySelector("#radiusBadge"),
-  radiusBadgeValue: document.querySelector("#radiusBadgeValue"),
   bubbleList: document.querySelector("#bubbleList"),
   pulseTitle: document.querySelector("#pulseTitle"),
   pulseText: document.querySelector("#pulseText"),
@@ -106,7 +104,6 @@ function bindEvents() {
   els.createDialog.addEventListener("close", hideRadiusPreview);
   els.radiusInput.addEventListener("input", () => {
     els.radiusValue.textContent = els.radiusInput.value;
-    els.radiusBadgeValue.textContent = els.radiusInput.value;
     updateRadiusPreview();
   });
   els.createForm.addEventListener("submit", createBubble);
@@ -249,11 +246,16 @@ function showRadiusPreview() {
       draggable: true,
       icon: L.divIcon({
         className: "create-pin",
-        html: `<div class="create-pin-inner"></div>`,
-        iconSize: [34, 42],
-        iconAnchor: [17, 40],
+        html: `<div class="create-pin-label">Bubble here</div><div class="create-pin-inner"></div>`,
+        iconSize: [96, 62],
+        iconAnchor: [48, 58],
       }),
     }).addTo(state.map);
+    state.createPin.bindTooltip("Drag me or click the map", {
+      direction: "top",
+      offset: [0, -44],
+      permanent: false,
+    });
     state.createPin.on("drag", () => {
       const pos = state.createPin.getLatLng();
       setCreateCoords(pos.lat, pos.lng);
@@ -261,8 +263,6 @@ function showRadiusPreview() {
     state.createPin.on("dragend", () => toast("Bubble pin moved."));
   }
   state.map.on("click", handleCreateMapClick);
-  els.radiusBadgeValue.textContent = els.radiusInput.value;
-  els.radiusBadge.classList.remove("hidden");
   updateRadiusPreview();
   toast("Drag the bubble pin or click the map to choose the event spot.");
 }
@@ -278,7 +278,6 @@ function updateRadiusPreview() {
 }
 
 function hideRadiusPreview() {
-  els.radiusBadge.classList.add("hidden");
   state.map.off("click", handleCreateMapClick);
   if (state.radiusPreview) {
     state.radiusPreview.remove();
