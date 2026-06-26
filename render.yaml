@@ -2,7 +2,7 @@ services:
   - type: web
     name: bubblyr
     runtime: python
-    plan: starter
+    plan: free
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn app:app
     healthCheckPath: /healthz
@@ -10,10 +10,4 @@ services:
       - key: SECRET_KEY
         generateValue: true
       - key: DATABASE_URL
-        fromDatabase:
-          name: bubblyr-db
-          property: connectionString
-
-databases:
-  - name: bubblyr-db
-    plan: basic-256mb
+        sync: false

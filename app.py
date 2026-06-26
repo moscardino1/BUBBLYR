@@ -36,33 +36,33 @@ SESSION_COOKIE_MAX_AGE = 8 * 60 * 60
 
 CATEGORIES = {
     "Transit": {
-        "label": "Muni Meltdown",
-        "prompt": "Train blocked, traffic, airport, bus, road closure, investor commute risk",
+        "label": "Transit",
+        "prompt": "Trains, buses, traffic, airport, road closures",
         "color": "#f59e0b",
     },
     "Safety": {
-        "label": "Oh No",
-        "prompt": "Accident, fire, police, unsafe area, medical help, bad vibes with consequences",
+        "label": "Safety",
+        "prompt": "Accidents, fire, police, medical help, unsafe areas",
         "color": "#ef4444",
     },
-    "Earth": {
-        "label": "Planet Bug",
-        "prompt": "Earthquake, storm, smoke, flood, unusual weather, nature shipping a breaking change",
+    "Weather": {
+        "label": "Weather",
+        "prompt": "Earthquake, storm, smoke, flood, unusual weather",
         "color": "#14b8a6",
     },
     "Utilities": {
-        "label": "Infra Oops",
-        "prompt": "Power, water, internet, building, public service, the smart city forgetting to be smart",
+        "label": "Utilities",
+        "prompt": "Power, water, internet, buildings, public services",
         "color": "#6366f1",
     },
-    "Crowd": {
-        "label": "Crowd Alpha",
-        "prompt": "Queue, event, protest, noise, what is happening here, line-to-DAO pipeline",
+    "Crowds": {
+        "label": "Crowds",
+        "prompt": "Queues, events, protests, noise, unusual gatherings",
         "color": "#a855f7",
     },
     "General": {
-        "label": "Unscoped Chaos",
-        "prompt": "Anything nearby that people should understand before a PM makes a dashboard",
+        "label": "General",
+        "prompt": "Anything nearby people should understand quickly",
         "color": "#2563eb",
     },
 }
@@ -163,9 +163,9 @@ def create_app() -> Flask:
                 "guest": session["guest_name"],
                 "categories": CATEGORIES,
                 "privacy": [
-                    "No account, because even growth bros need boundaries.",
+                    "No account or profile.",
                     "Anonymous guest identity rotates with the browser session.",
-                    "Bubbles expire after 24 hours of inactivity, like most 2028 moat claims.",
+                    "Bubbles expire after 24 hours of inactivity.",
                     "Coordinates shown publicly are slightly blurred.",
                 ],
             }
@@ -203,9 +203,9 @@ def create_app() -> Flask:
         lng = parse_float(payload.get("lng"))
 
         if not title:
-            return jsonify({"error": "Ship a short question before the standup ends."}), 400
+            return jsonify({"error": "Add a short question or title."}), 400
         if lat is None or lng is None:
-            return jsonify({"error": "Location is required to create local alpha."}), 400
+            return jsonify({"error": "Location is required to create a local bubble."}), 400
 
         now = int(time.time())
         bubble_id = secrets.token_urlsafe(10)
@@ -248,9 +248,9 @@ def create_app() -> Flask:
         text = clean_text(payload.get("text"), 400)
 
         if not text:
-            return jsonify({"error": "Write actual signal first."}), 400
+            return jsonify({"error": "Write a message first."}), 400
         if looks_like_spam(text):
-            return jsonify({"error": "That reads like a LinkedIn launch post. Try normal words."}), 400
+            return jsonify({"error": "That looks like spam. Try writing it normally."}), 400
         if lat is None or lng is None:
             return jsonify({"error": "Location is required to speak here."}), 400
 
@@ -261,7 +261,7 @@ def create_app() -> Flask:
 
             distance = haversine_meters(lat, lng, bubble["lat"], bubble["lng"])
             if distance > bubble["radius_meters"] + 75:
-                return jsonify({"error": "You are outside this bubble. Remote work does not count."}), 403
+                return jsonify({"error": "You are outside this bubble."}), 403
 
             last = (
                 conn.execute(
@@ -275,9 +275,9 @@ def create_app() -> Flask:
             )
             now = int(time.time())
             if last and now - last["created_at"] < 2:
-                return jsonify({"error": "Slow mode: the market can wait two seconds."}), 429
+                return jsonify({"error": "Slow mode: wait a moment."}), 429
             if last and last["text"].strip().lower() == text.strip().lower():
-                return jsonify({"error": "Duplicate message blocked. We already heard the pitch."}), 400
+                return jsonify({"error": "Duplicate message blocked."}), 400
 
             conn.execute(
                 insert(messages).values(

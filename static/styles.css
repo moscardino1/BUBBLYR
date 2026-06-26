@@ -1,12 +1,12 @@
 :root {
-  --bg: #f7f5ee;
-  --ink: #15120d;
-  --muted: #70695c;
-  --line: #dfd6c3;
+  --bg: #f6f7fb;
+  --ink: #101828;
+  --muted: #667085;
+  --line: #e4e7ec;
   --panel: #ffffff;
   --accent: #0f766e;
-  --danger: #dc2626;
-  --gold: #f5b84b;
+  --accent-strong: #115e59;
+  --shadow: 0 20px 50px rgba(16, 24, 40, 0.12);
 }
 
 * {
@@ -20,9 +20,7 @@ body {
 
 body {
   margin: 0;
-  background:
-    linear-gradient(135deg, rgba(245, 184, 75, 0.14), transparent 34%),
-    var(--bg);
+  background: var(--bg);
   color: var(--ink);
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
@@ -38,6 +36,10 @@ button {
   cursor: pointer;
 }
 
+.hidden {
+  display: none !important;
+}
+
 .shell {
   min-height: 100%;
   display: flex;
@@ -49,10 +51,10 @@ button {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 18px;
-  background: rgba(255, 252, 245, 0.9);
+  padding: 12px 20px;
+  background: rgba(255, 255, 255, 0.88);
   border-bottom: 1px solid var(--line);
-  backdrop-filter: blur(16px);
+  backdrop-filter: blur(18px);
   z-index: 10;
 }
 
@@ -64,21 +66,21 @@ p {
 
 h1 {
   font-size: 28px;
+  line-height: 1;
   letter-spacing: 0;
-  line-height: 0.95;
 }
 
 .subbrand {
   margin-top: 2px;
-  color: #9a6a0a;
-  font-size: 11px;
-  font-weight: 850;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 750;
 }
 
 .kicker {
-  color: #8a5d05;
+  color: var(--accent-strong);
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 850;
   text-transform: uppercase;
 }
 
@@ -89,7 +91,7 @@ h1 {
   border: 1px solid var(--line);
   border-radius: 999px;
   padding: 8px 12px;
-  background: #fffaf0;
+  background: var(--panel);
   font-size: 13px;
   font-weight: 800;
   white-space: nowrap;
@@ -99,13 +101,14 @@ h1 {
   width: 9px;
   height: 9px;
   border-radius: 999px;
-  background: var(--gold);
+  background: #12b76a;
+  box-shadow: 0 0 0 4px rgba(18, 183, 106, 0.12);
 }
 
 .layout {
   min-height: calc(100vh - 72px);
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 420px;
+  grid-template-columns: minmax(0, 1fr) 430px;
 }
 
 .map-panel {
@@ -116,21 +119,32 @@ h1 {
 #map {
   position: absolute;
   inset: 0;
-  background: #eadfcb;
+  background: #eef2f6;
 }
 
 .location-gate {
   position: absolute;
-  inset: 24px;
+  left: 24px;
+  top: 24px;
+  width: min(430px, calc(100% - 48px));
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
   gap: 14px;
-  background: rgba(255, 250, 240, 0.94);
+  background: rgba(255, 255, 255, 0.94);
   border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: var(--shadow);
   z-index: 500;
+}
+
+.location-gate h2 {
+  font-size: 26px;
+}
+
+.location-gate p {
+  color: var(--muted);
+  line-height: 1.45;
 }
 
 .location-actions,
@@ -142,16 +156,11 @@ h1 {
   align-items: center;
 }
 
-.location-gate p {
-  max-width: 360px;
-  color: var(--muted);
-}
-
 .location-gate button,
 .primary,
 .message-form button {
   border: 0;
-  border-radius: 8px;
+  border-radius: 10px;
   background: var(--ink);
   color: #fff;
   padding: 12px 16px;
@@ -162,8 +171,8 @@ h1 {
 .card-actions button,
 .empty button {
   border: 1px solid var(--line);
-  border-radius: 8px;
-  background: #fffdf8;
+  border-radius: 10px;
+  background: #fff;
   color: var(--ink);
   padding: 10px 12px;
   font-weight: 850;
@@ -171,23 +180,23 @@ h1 {
 
 .create-button {
   position: absolute;
-  right: 22px;
-  bottom: 22px;
+  right: 24px;
+  bottom: 24px;
   z-index: 600;
-  width: 58px;
-  height: 58px;
+  width: 60px;
+  height: 60px;
   border: 0;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #15120d, #7a4f00);
+  border-radius: 18px;
+  background: var(--accent);
   color: #fff;
   font-size: 34px;
   line-height: 1;
-  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 18px 34px rgba(15, 118, 110, 0.3);
 }
 
 .side-panel {
   border-left: 1px solid var(--line);
-  background: rgba(255, 252, 245, 0.82);
+  background: rgba(255, 255, 255, 0.92);
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -212,7 +221,7 @@ h1 {
 }
 
 .filter.active {
-  background: #15120d;
+  background: var(--ink);
   color: #fff;
   border-color: var(--ink);
 }
@@ -225,12 +234,12 @@ h1 {
 }
 
 .pulse h2 {
-  font-size: 22px;
+  font-size: 24px;
 }
 
 .pulse p {
   color: var(--muted);
-  line-height: 1.4;
+  line-height: 1.45;
 }
 
 .idea-strip {
@@ -242,8 +251,8 @@ h1 {
 
 .idea-strip span {
   padding: 7px 10px;
-  background: #fff1cf;
-  color: #6b4300;
+  background: #ecfdf3;
+  color: #027a48;
   border-radius: 999px;
   font-size: 12px;
   font-weight: 800;
@@ -254,21 +263,22 @@ h1 {
   overflow: auto;
   padding: 0 14px 18px;
   display: grid;
-  gap: 10px;
+  gap: 12px;
 }
 
 .bubble-card {
   border: 1px solid var(--line);
-  border-radius: 8px;
-  background: #fffdf8;
+  border-radius: 14px;
+  background: #fff;
   padding: 14px;
   display: grid;
-  gap: 10px;
+  gap: 12px;
+  box-shadow: 0 8px 22px rgba(16, 24, 40, 0.04);
 }
 
 .bubble-card.selected {
-  border-color: #15120d;
-  box-shadow: 0 0 0 2px rgba(21, 18, 13, 0.08);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
 }
 
 .bubble-main {
@@ -289,9 +299,9 @@ h1 {
 }
 
 .card-actions button:last-child {
-  background: #15120d;
+  background: var(--ink);
   color: #fff;
-  border-color: #15120d;
+  border-color: var(--ink);
 }
 
 .bubble-row {
@@ -312,13 +322,15 @@ h1 {
 }
 
 .bubble-title {
+  margin-top: 10px;
   font-size: 18px;
   font-weight: 900;
 }
 
 .bubble-text {
+  margin-top: 6px;
   color: var(--muted);
-  line-height: 1.35;
+  line-height: 1.4;
 }
 
 .metrics {
@@ -339,16 +351,17 @@ h1 {
 
 .modal::backdrop,
 .chat-modal::backdrop {
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(16, 24, 40, 0.48);
 }
 
 .modal form {
   width: min(520px, calc(100vw - 24px));
   background: #fff;
-  border-radius: 8px;
-  padding: 18px;
+  border-radius: 18px;
+  padding: 20px;
   display: grid;
   gap: 14px;
+  box-shadow: var(--shadow);
 }
 
 .modal-head,
@@ -363,7 +376,7 @@ h1 {
   width: 38px;
   height: 38px;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 10px;
   background: #fff;
   font-weight: 900;
 }
@@ -371,7 +384,7 @@ h1 {
 label {
   display: grid;
   gap: 6px;
-  color: #374151;
+  color: #344054;
   font-size: 13px;
   font-weight: 850;
 }
@@ -381,7 +394,7 @@ textarea,
 select {
   width: 100%;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 11px 12px;
   background: #fff;
   color: var(--ink);
@@ -401,8 +414,9 @@ textarea {
   background: #fff;
   display: flex;
   flex-direction: column;
-  border-radius: 8px;
+  border-radius: 18px;
   overflow: hidden;
+  box-shadow: var(--shadow);
 }
 
 .chat-head {
@@ -427,14 +441,14 @@ textarea {
   align-items: center;
   text-align: center;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 10px;
   overflow: hidden;
 }
 
 .vote-box button {
   height: 34px;
   border: 0;
-  background: #f8fafc;
+  background: #f9fafb;
 }
 
 .messages {
@@ -444,7 +458,7 @@ textarea {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  background: #f8faf7;
+  background: #f9fafb;
 }
 
 .message {
@@ -459,7 +473,7 @@ textarea {
 
 .message-body {
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 14px;
   padding: 10px 12px;
   background: #fff;
   line-height: 1.4;
@@ -467,9 +481,9 @@ textarea {
 }
 
 .message.mine .message-body {
-  background: #15120d;
+  background: var(--accent);
   color: #fff;
-  border-color: #0f766e;
+  border-color: var(--accent);
 }
 
 .message-meta {
@@ -483,7 +497,7 @@ textarea {
 
 .message-actions {
   display: flex;
-  gap: 6px;
+  gap: 8px;
 }
 
 .message-actions button {
@@ -512,7 +526,7 @@ textarea {
   bottom: 18px;
   transform: translateX(-50%);
   z-index: 2000;
-  background: #15120d;
+  background: var(--ink);
   color: #fff;
   border-radius: 999px;
   padding: 10px 14px;
@@ -526,11 +540,11 @@ textarea {
 
 .empty {
   border: 1px dashed var(--line);
-  border-radius: 8px;
-  padding: 28px;
+  border-radius: 14px;
+  padding: 24px;
   text-align: center;
   color: var(--muted);
-  background: rgba(255, 255, 255, 0.65);
+  background: #fff;
   display: grid;
   gap: 10px;
   justify-items: center;
@@ -540,7 +554,7 @@ textarea {
   color: var(--ink);
 }
 
-@media (max-width: 860px) {
+@media (max-width: 900px) {
   .layout {
     grid-template-columns: 1fr;
     grid-template-rows: 50vh minmax(0, 1fr);
@@ -561,13 +575,19 @@ textarea {
   }
 
   h1 {
-    font-size: 21px;
+    font-size: 24px;
   }
 
   .identity {
     max-width: 46vw;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+
+  .location-gate {
+    left: 12px;
+    top: 12px;
+    width: calc(100% - 24px);
   }
 
   .chat-modal {

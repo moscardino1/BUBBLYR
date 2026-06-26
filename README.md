@@ -4,28 +4,17 @@ Anonymous local bubbles for answering one surprisingly hard civic question:
 
 > what is going on right here?
 
-This is the Flask rebuild after a fictional 2028 VC buddy PM walked into the room, said "hyperlocal is back, but make it anonymous and board-deckable," and then left for a panel about AI-native sidewalks.
-
-The roast is intentional. The code is still small.
-
-## The 2028 PM Mandate
-
-- Rename the vibe without renaming the database because velocity.
-- Turn "nearby questions" into "local alpha."
-- Make it feel like San Francisco invented asking a person next to you what happened.
-- Keep it anonymous because even growth teams should occasionally experience restraint.
-- Add voting so useful eyewitness info can beat confident nonsense.
-- Keep Flask, SQLite, plain HTML, plain CSS, and plain JavaScript because the founder should understand the product before hiring a platform team.
+The app is deliberately small: Flask, SQLAlchemy, one HTML template, plain CSS, and plain JavaScript.
 
 ## Product Idea
 
 BUBBLYR is a local question layer. Someone near a place creates a temporary bubble with a practical question:
 
-- Why is Caltrain doing performance art?
-- Was that an earthquake or just another demo day?
+- Why is the train blocked?
+- Was that an earthquake?
 - Where is the smoke coming from?
-- Is this road closed, or did the city pivot to vibes?
-- Why is there a huge queue and does it have TAM?
+- Is this road closed?
+- Why is there a huge queue?
 
 Other nearby people answer anonymously, vote useful information up or down, and report bad messages. Bubbles expire after 24 hours of inactivity.
 
@@ -41,18 +30,18 @@ The prototype is anonymous first:
 - Bubbles and messages are deleted after 24 hours of inactivity.
 - Posting is allowed only while physically near the bubble radius.
 
-This is not production-grade anonymity yet. For production you would still need HTTPS, stricter rate limits, abuse controls, IP retention policy decisions, and a real privacy review from someone who does not say "data flywheel" before breakfast.
+This is not production-grade anonymity yet. For production you would still need HTTPS, stricter rate limits, abuse controls, IP retention policy decisions, and a real privacy review.
 
 ## Categories
 
-The categories are now useful, but dressed like they just raised a chaotic seed round:
+The categories are practical on purpose:
 
-- `Transit` / Muni Meltdown: trains, buses, roads, airport, traffic
-- `Safety` / Oh No: accident, fire, police, medical help, unsafe area
-- `Earth` / Planet Bug: earthquake, storm, smoke, flood, unusual weather
-- `Utilities` / Infra Oops: power, water, internet, buildings, public services
-- `Crowd` / Crowd Alpha: queue, event, protest, noise, "what is happening here?"
-- `General` / Unscoped Chaos: anything else nearby
+- `Transit`: trains, buses, roads, airport, traffic
+- `Safety`: accident, fire, police, medical help, unsafe area
+- `Weather`: earthquake, storm, smoke, flood, unusual weather
+- `Utilities`: power, water, internet, buildings, public services
+- `Crowds`: queue, event, protest, noise, "what is happening here?"
+- `General`: anything else nearby
 
 ## Run Locally
 
@@ -72,11 +61,11 @@ Browser geolocation usually works on `localhost` / `127.0.0.1`.
 
 ## File Map
 
-- `app.py`: Flask app, SQLAlchemy tables, API routes, privacy/radius checks, VC-flavored category metadata.
+- `app.py`: Flask app, SQLAlchemy tables, API routes, privacy/radius checks, category metadata.
 - `templates/index.html`: single page HTML shell with the new BUBBLYR positioning.
-- `static/app.js`: map, location, polling, forms, chat, voting, and the product roast copy.
-- `static/styles.css`: responsive app styling with a warmer SF pitch-deck palette.
-- `render.yaml`: one-click Render Blueprint for the web app and Postgres.
+- `static/app.js`: map, location, polling, forms, isolated demo mode, chat, voting.
+- `static/styles.css`: responsive app styling.
+- `render.yaml`: Render Blueprint for the free web app; paste an external Postgres `DATABASE_URL`.
 - `Procfile`: Heroku/Render-compatible process command.
 - `data/bubblyr.db`: created automatically for local SQLite development only.
 
@@ -84,22 +73,37 @@ The old React/Vite prototype files were removed so deployment sees one app, not 
 
 ## Deploy Recommendation
 
-Use Render first.
+Use Render for the web app and Neon for the free Postgres database.
 
-Render is the better fit for this app because BUBBLYR is a real Flask web service with shared state, polling today, and likely WebSockets/Redis/Postgres tomorrow. Render's Flask docs use `pip install -r requirements.txt` and `gunicorn app:app`, and Render Blueprints can provision both the web service and a Postgres database from `render.yaml`.
+Render is the better fit for the Flask service because BUBBLYR is a real web app with shared state, polling today, and likely WebSockets/Redis tomorrow. Render's Flask docs use `pip install -r requirements.txt` and `gunicorn app:app`.
+
+For the database, use Neon first. Render has integrated Postgres, but the free Render Postgres option is time-limited. Neon is better for a quick, free, persistent MVP database.
 
 Vercel can run Flask through Python Serverless Functions using WSGI, but that is a better fit for stateless endpoints. For a location chat app that will need shared state and possibly long-lived connections later, it adds architectural friction too early.
 
-### Render Button Path
+### Quick Free Deploy Path
+
+1. Create a free Neon project.
+2. Copy its pooled Postgres connection string.
+3. In Render, create a Blueprint from this GitHub repo.
+4. Render reads `render.yaml` and creates the free `bubblyr` web service.
+5. When Render asks for `DATABASE_URL`, paste the Neon connection string.
+6. Deploy.
+
+The app already supports this:
+
+- Local dev uses SQLite automatically.
+- Cloud deploy uses `DATABASE_URL`.
+- SQLAlchemy creates the required tables on startup.
+- `SECRET_KEY` is generated by Render.
+
+### Render-Only Paid Path
 
 1. Push this repo to GitHub.
-2. In Render, create a new Blueprint from the repo.
-3. Render reads `render.yaml`, creates:
-   - `bubblyr` web service
-   - `bubblyr-db` Postgres database
-   - generated `SECRET_KEY`
-   - `DATABASE_URL` wired from Postgres
-4. Every push to the linked branch deploys automatically.
+2. In Render, create a Postgres database.
+3. Copy its internal database URL.
+4. Add it as `DATABASE_URL` on the `bubblyr` web service.
+5. Deploy.
 
 For a tiny MVP, the current config is enough. When traffic grows, scale the Render web service plan/instances and then add Redis for rate limits and live presence.
 
@@ -114,19 +118,17 @@ For a tiny MVP, the current config is enough. When traffic grows, scale the Rend
 - `POST /api/messages/<id>/vote`: vote a message up or down.
 - `POST /api/messages/<id>/report`: report abuse.
 
-## Sensible Next Steps
-
 ## Usability Notes
 
-The app now has a demo path because cold-start local apps are otherwise painfully empty:
+The demo path is isolated from the real database:
 
-- Use `Try SF demo spot` if browser geolocation is blocked or you want to test from your desk.
-- Use `Seed demo bubbles` to create nearby sample conversations.
+- Use `Preview demo` on first entry to understand the product.
+- Demo bubbles and demo messages live only in browser memory.
+- Demo mode never calls the real create/message/vote endpoints.
+- Exit demo to use the real location-based app.
 - Click `Show on map` to locate a bubble without opening chat.
 - Click `Open chat` to enter the conversation.
 - On the map, click a marker to select it, or double-click it to open chat.
-
-These are prototype affordances. In production, `Seed demo bubbles` should become an onboarding/demo-only feature or disappear behind a development flag.
 
 ## Sensible Next Steps
 

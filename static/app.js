@@ -1,8 +1,12 @@
+const DEMO_SEEN_KEY = "bubblyr_demo_seen_v1";
+
 const state = {
   guest: "Guest",
   coords: null,
   category: "All",
   bubbles: [],
+  demoBubbles: [],
+  demoMode: false,
   activeBubbleId: null,
   selectedBubbleId: null,
   map: null,
@@ -16,7 +20,7 @@ const els = {
   guestName: document.querySelector("#guestName"),
   enableLocation: document.querySelector("#enableLocation"),
   demoLocation: document.querySelector("#demoLocation"),
-  seedDemo: document.querySelector("#seedDemo"),
+  exitDemo: document.querySelector("#exitDemo"),
   recenterMap: document.querySelector("#recenterMap"),
   locationGate: document.querySelector("#locationGate"),
   createButton: document.querySelector("#createButton"),
@@ -31,6 +35,7 @@ const els = {
   bubbleList: document.querySelector("#bubbleList"),
   pulseTitle: document.querySelector("#pulseTitle"),
   pulseText: document.querySelector("#pulseText"),
+  modeLabel: document.querySelector("#modeLabel"),
   filters: document.querySelector("#filters"),
   chatDialog: document.querySelector("#chatDialog"),
   closeChat: document.querySelector("#closeChat"),
@@ -50,6 +55,7 @@ init();
 async function init() {
   initMap();
   bindEvents();
+  hideDemoIfSeen();
 
   const session = await api("/api/session");
   state.guest = session.guest;
@@ -69,10 +75,8 @@ function initMap() {
 
 function bindEvents() {
   els.enableLocation.addEventListener("click", requestLocation);
-  els.demoLocation.addEventListener("click", () => {
-    setLocation({ lat: 37.7764, lng: -122.3948 }, "Demo location set near SF Caltrain.");
-  });
-  els.seedDemo.addEventListener("click", seedDemoBubbles);
+  els.demoLocation.addEventListener("click", startDemoMode);
+  els.exitDemo.addEventListener("click", exitDemoMode);
   els.recenterMap.addEventListener("click", () => {
     if (!state.coords) {
       toast("Pick a location first.");
@@ -82,7 +86,7 @@ function bindEvents() {
   });
   els.createButton.addEventListener("click", () => {
     if (!state.coords) {
-      toast("Turn on location first. The pitch requires proximity.");
+      toast("Turn on location first.");
       return;
     }
     els.createDialog.showModal();
@@ -107,7 +111,15 @@ function bindEvents() {
   els.bubbleDown.addEventListener("click", () => voteBubble("down"));
 }
 
+function hideDemoIfSeen() {
+  if (localStorage.getItem(DEMO_SEEN_KEY)) {
+    els.demoLocation.classList.add("hidden");
+  }
+}
+
 function requestLocation() {
+  localStorage.setItem(DEMO_SEEN_KEY, "1");
+  els.demoLocation.classList.add("hidden");
   if (!navigator.geolocation) {
     toast("This browser has no location support.");
     return;
@@ -115,14 +127,39 @@ function requestLocation() {
 
   navigator.geolocation.watchPosition(
     (position) => {
+      state.demoMode = false;
       setLocation({
         lat: position.coords.latitude,
         lng: position.coords.longitude,
       });
     },
-    () => toast("Location permission was blocked. Respectable boundary, terrible demo."),
+    () => toast("Location permission was blocked."),
     { enableHighAccuracy: true, timeout: 10000, maximumAge: 10000 },
   );
+}
+
+function startDemoMode() {
+  localStorage.setItem(DEMO_SEEN_KEY, "1");
+  state.demoMode = true;
+  state.demoBubbles = buildDemoBubbles();
+  els.exitDemo.classList.remove("hidden");
+  els.demoLocation.classList.add("hidden");
+  setLocation({ lat: 37.7764, lng: -122.3948 }, "Demo mode: no real data is being read or written.");
+}
+
+function exitDemoMode() {
+  state.demoMode = false;
+  state.demoBubbles = [];
+  state.bubbles = [];
+  state.activeBubbleId = null;
+  state.selectedBubbleId = null;
+  els.exitDemo.classList.add("hidden");
+  clearMarkers();
+  closeChat();
+  els.locationGate.style.display = "flex";
+  state.coords = null;
+  renderBubbles();
+  renderPulse();
 }
 
 function setLocation(coords, message) {
@@ -130,7 +167,7 @@ function setLocation(coords, message) {
   els.locationGate.style.display = "none";
   updateUserMarker();
   refreshBubbles();
-  if (!state.refreshTimer) {
+  if (!state.refreshTimer && !state.demoMode) {
     state.refreshTimer = setInterval(refreshBubbles, 4000);
   }
   if (message) toast(message);
@@ -157,15 +194,20 @@ function updateUserMarker() {
   } else {
     state.userMarker.setLatLng(latLng);
     state.userCircle.setLatLng(latLng);
+    state.map.setView(latLng, Math.max(state.map.getZoom(), 15));
   }
 }
 
 async function refreshBubbles() {
   if (!state.coords) return;
   try {
-    const url = `/api/bubbles?lat=${state.coords.lat}&lng=${state.coords.lng}&category=${state.category}`;
-    const data = await api(url);
-    state.bubbles = data.bubbles;
+    if (state.demoMode) {
+      state.bubbles = filterDemoBubbles();
+    } else {
+      const url = `/api/bubbles?lat=${state.coords.lat}&lng=${state.coords.lng}&category=${state.category}`;
+      const data = await api(url);
+      state.bubbles = data.bubbles;
+    }
     renderBubbles();
     renderMarkers();
     renderPulse();
@@ -180,36 +222,42 @@ async function refreshBubbles() {
 function renderPulse() {
   const count = state.bubbles.length;
   const messages = state.bubbles.reduce((total, bubble) => total + bubble.message_count, 0);
+  els.modeLabel.textContent = state.demoMode ? "Demo mode" : "Local pulse";
+
   if (!state.coords) {
     els.pulseTitle.textContent = "Waiting for location";
+    els.pulseText.textContent = "Use your location to see real nearby bubbles.";
     return;
   }
   if (!count) {
-    els.pulseTitle.textContent = "No alpha detected";
-    els.pulseText.textContent = "The neighborhood is either peaceful or under-instrumented. Start with one useful question.";
+    els.pulseTitle.textContent = state.demoMode ? "Demo is empty" : "No bubbles nearby";
+    els.pulseText.textContent = state.demoMode
+      ? "Demo data only exists in this browser tab."
+      : "Start a useful local question people nearby can answer.";
     return;
   }
   const top = state.bubbles[0];
-  els.pulseTitle.textContent = `${count} live bubble${count === 1 ? "" : "s"}`;
-  els.pulseText.textContent = `${messages} anonymous datapoint${messages === 1 ? "" : "s"}. Closest chaos: ${top.title}`;
+  els.pulseTitle.textContent = `${count} bubble${count === 1 ? "" : "s"} nearby`;
+  els.pulseText.textContent = `${messages} message${messages === 1 ? "" : "s"}. Closest: ${top.title}`;
 }
 
 function renderBubbles() {
   if (!state.bubbles.length) {
     els.bubbleList.innerHTML = `
       <div class="empty">
-        <strong>No bubbles here yet.</strong>
-        <span>Classic cold-start problem. Create one, or seed demo bubbles to test the full loop.</span>
-        <button type="button" data-create-empty>Start a bubble</button>
+        <strong>${state.demoMode ? "Demo has no bubbles here." : "No bubbles here yet."}</strong>
+        <span>${state.demoMode ? "Exit demo to use the real app." : "Create one clear, useful question for people nearby."}</span>
+        ${state.coords ? '<button type="button" data-create-empty>Start a bubble</button>' : ""}
       </div>
     `;
-    els.bubbleList.querySelector("[data-create-empty]").addEventListener("click", () => els.createButton.click());
+    const createButton = els.bubbleList.querySelector("[data-create-empty]");
+    if (createButton) createButton.addEventListener("click", () => els.createButton.click());
     return;
   }
 
   els.bubbleList.innerHTML = state.bubbles
     .map((bubble) => {
-      const category = window.PROXMUNITY_CATEGORIES[bubble.category];
+      const category = window.BUBBLYR_CATEGORIES[bubble.category] || window.BUBBLYR_CATEGORIES.General;
       return `
         <article class="bubble-card ${state.selectedBubbleId === bubble.id ? "selected" : ""}">
           <button class="bubble-main" type="button" data-open-bubble="${bubble.id}">
@@ -218,11 +266,12 @@ function renderBubbles() {
               <span class="metrics">${formatDistance(bubble.distance_meters)}</span>
             </div>
             <div class="bubble-title">${escapeHtml(bubble.title)}</div>
-            <p class="bubble-text">${escapeHtml(bubble.description || bubble.latest_message || "Fresh local signal, pre-consensus")}</p>
+            <p class="bubble-text">${escapeHtml(bubble.description || bubble.latest_message || "Active local question")}</p>
             <div class="metrics">
-              <span>${bubble.message_count} signals</span>
+              <span>${bubble.message_count} messages</span>
               <span>${bubble.score} votes</span>
               <span>${bubble.radius_meters}m radius</span>
+              ${state.demoMode ? "<span>demo only</span>" : ""}
             </div>
           </button>
           <div class="card-actions">
@@ -252,7 +301,7 @@ function renderMarkers() {
   }
 
   state.bubbles.forEach((bubble) => {
-    const category = window.PROXMUNITY_CATEGORIES[bubble.category];
+    const category = window.BUBBLYR_CATEGORIES[bubble.category] || window.BUBBLYR_CATEGORIES.General;
     const isSelected = state.selectedBubbleId === bubble.id;
     if (state.markers.has(bubble.id)) {
       const marker = state.markers.get(bubble.id);
@@ -273,13 +322,20 @@ function renderMarkers() {
   });
 }
 
+function clearMarkers() {
+  for (const marker of state.markers.values()) {
+    marker.remove();
+  }
+  state.markers.clear();
+}
+
 function markerStyle(color, messageCount, selected) {
   return {
-    radius: selected ? 18 : Math.max(8, Math.min(22, 8 + messageCount)),
-    color: selected ? "#15120d" : "#ffffff",
+    radius: selected ? 18 : Math.max(8, Math.min(20, 8 + messageCount)),
+    color: selected ? "#101828" : "#ffffff",
     weight: selected ? 5 : 3,
     fillColor: color,
-    fillOpacity: selected ? 1 : 0.88,
+    fillOpacity: selected ? 1 : 0.9,
   };
 }
 
@@ -289,14 +345,10 @@ function focusBubble(id, fromMap = false) {
   state.selectedBubbleId = id;
   state.map.setView([bubble.lat, bubble.lng], Math.max(state.map.getZoom(), 16));
   const marker = state.markers.get(id);
-  if (marker) {
-    marker.openTooltip();
-  }
+  if (marker) marker.openTooltip();
   renderBubbles();
   renderMarkers();
-  if (fromMap) {
-    toast("Bubble selected. Double-click the marker or use Open chat.");
-  }
+  if (fromMap) toast("Bubble selected. Double-click marker or use Open chat.");
 }
 
 async function createBubble(event) {
@@ -310,64 +362,23 @@ async function createBubble(event) {
     lng: state.coords.lng,
   };
 
-  const data = await api("/api/bubbles", {
-    method: "POST",
-    body: JSON.stringify(payload),
-  });
+  let bubble;
+  if (state.demoMode) {
+    bubble = createDemoBubble(payload);
+  } else {
+    const data = await api("/api/bubbles", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+    bubble = data.bubble;
+  }
 
   els.createForm.reset();
   els.radiusInput.value = 600;
   els.radiusValue.textContent = "600";
   els.createDialog.close();
   await refreshBubbles();
-  openChat(data.bubble.id);
-}
-
-async function seedDemoBubbles() {
-  if (!state.coords) {
-    toast("Pick a location first.");
-    return;
-  }
-
-  const samples = [
-    {
-      title: "Why is the station frozen?",
-      description: "People are waiting, no clear announcement yet.",
-      category: "Transit",
-      lat: state.coords.lat + 0.001,
-      lng: state.coords.lng + 0.001,
-      radius_meters: 900,
-    },
-    {
-      title: "Smoke near the corner?",
-      description: "Looks like it is coming from two blocks east.",
-      category: "Safety",
-      lat: state.coords.lat - 0.0009,
-      lng: state.coords.lng + 0.0007,
-      radius_meters: 700,
-    },
-    {
-      title: "Huge queue outside",
-      description: "Trying to figure out whether this is an event or just lunch.",
-      category: "Crowd",
-      lat: state.coords.lat + 0.0004,
-      lng: state.coords.lng - 0.0011,
-      radius_meters: 500,
-    },
-  ];
-
-  try {
-    for (const sample of samples) {
-      await api("/api/bubbles", {
-        method: "POST",
-        body: JSON.stringify(sample),
-      });
-    }
-    await refreshBubbles();
-    toast("Demo bubbles seeded nearby.");
-  } catch (error) {
-    toast(error.message);
-  }
+  openChat(bubble.id);
 }
 
 async function openChat(id) {
@@ -381,31 +392,37 @@ async function openChat(id) {
 
 function closeChat() {
   state.activeBubbleId = null;
-  els.chatDialog.close();
+  if (els.chatDialog.open) els.chatDialog.close();
 }
 
 async function refreshChat(id, scroll) {
   if (!state.coords) return;
-  let data;
-  try {
-    data = await api(`/api/bubbles/${id}?lat=${state.coords.lat}&lng=${state.coords.lng}`);
-  } catch (error) {
-    if (state.activeBubbleId === id) closeChat();
-    state.activeBubbleId = null;
-    state.selectedBubbleId = null;
-    toast("That bubble expired or disappeared.");
-    refreshBubbles();
-    return;
+  let bubble;
+  if (state.demoMode) {
+    bubble = state.demoBubbles.find((item) => item.id === id);
+  } else {
+    try {
+      const data = await api(`/api/bubbles/${id}?lat=${state.coords.lat}&lng=${state.coords.lng}`);
+      bubble = data.bubble;
+    } catch (error) {
+      state.activeBubbleId = null;
+      state.selectedBubbleId = null;
+      if (els.chatDialog.open) closeChat();
+      toast("That bubble expired or disappeared.");
+      refreshBubbles();
+      return;
+    }
   }
-  const bubble = data.bubble;
+  if (!bubble) return;
+
   els.chatTitle.textContent = bubble.title;
-  els.chatMeta.textContent = `${bubble.category} · ${formatDistance(bubble.distance_meters)} · ${bubble.can_post ? "in the arena" : "read-only tourist"}`;
+  els.chatMeta.textContent = `${bubble.category} · ${formatDistance(bubble.distance_meters)} · ${bubble.can_post ? "in range" : "read only"}${state.demoMode ? " · demo" : ""}`;
   els.bubbleScore.textContent = bubble.score;
   els.messageInput.disabled = !bubble.can_post;
-  els.messageInput.placeholder = bubble.can_post ? "What do your human eyes report?" : "Move closer to participate";
+  els.messageInput.placeholder = bubble.can_post ? "What do you see?" : "Move closer to participate";
 
   els.chatMessages.innerHTML = `
-    <div class="empty">${escapeHtml(bubble.description || "No context yet. The MVP remains brave.")}</div>
+    <div class="empty">${escapeHtml(bubble.description || "No extra context yet.")}</div>
     ${bubble.messages.map(renderMessage).join("")}
   `;
 
@@ -416,9 +433,7 @@ async function refreshChat(id, scroll) {
     button.addEventListener("click", () => reportMessage(button.dataset.report));
   });
 
-  if (scroll) {
-    els.chatMessages.scrollTop = els.chatMessages.scrollHeight;
-  }
+  if (scroll) els.chatMessages.scrollTop = els.chatMessages.scrollHeight;
 }
 
 function renderMessage(message) {
@@ -430,7 +445,7 @@ function renderMessage(message) {
       </div>
       <div class="message-body">${escapeHtml(message.text)}</div>
       <div class="message-actions">
-        <button type="button" data-message-vote="${message.id}" data-value="up">Signal</button>
+        <button type="button" data-message-vote="${message.id}" data-value="up">Useful</button>
         <button type="button" data-message-vote="${message.id}" data-value="down">Noise</button>
         ${message.is_mine ? "" : `<button type="button" data-report="${message.id}">Report</button>`}
       </div>
@@ -443,14 +458,18 @@ async function sendMessage(event) {
   if (!els.messageInput.value.trim() || !state.activeBubbleId) return;
 
   try {
-    await api(`/api/bubbles/${state.activeBubbleId}/messages`, {
-      method: "POST",
-      body: JSON.stringify({
-        text: els.messageInput.value,
-        lat: state.coords.lat,
-        lng: state.coords.lng,
-      }),
-    });
+    if (state.demoMode) {
+      addDemoMessage(state.activeBubbleId, els.messageInput.value.trim());
+    } else {
+      await api(`/api/bubbles/${state.activeBubbleId}/messages`, {
+        method: "POST",
+        body: JSON.stringify({
+          text: els.messageInput.value,
+          lat: state.coords.lat,
+          lng: state.coords.lng,
+        }),
+      });
+    }
     els.messageInput.value = "";
     await refreshChat(state.activeBubbleId, true);
     await refreshBubbles();
@@ -461,6 +480,13 @@ async function sendMessage(event) {
 
 async function voteBubble(value) {
   if (!state.activeBubbleId) return;
+  if (state.demoMode) {
+    const bubble = state.demoBubbles.find((item) => item.id === state.activeBubbleId);
+    if (bubble) bubble.score += value === "up" ? 1 : -1;
+    els.bubbleScore.textContent = bubble ? bubble.score : "0";
+    refreshBubbles();
+    return;
+  }
   const data = await api(`/api/bubbles/${state.activeBubbleId}/vote`, {
     method: "POST",
     body: JSON.stringify({ value }),
@@ -470,6 +496,12 @@ async function voteBubble(value) {
 }
 
 async function voteMessage(id, value) {
+  if (state.demoMode) {
+    const message = state.demoBubbles.flatMap((bubble) => bubble.messages).find((item) => item.id === id);
+    if (message) message.score += value === "up" ? 1 : -1;
+    refreshChat(state.activeBubbleId, false);
+    return;
+  }
   await api(`/api/messages/${id}/vote`, {
     method: "POST",
     body: JSON.stringify({ value }),
@@ -478,9 +510,140 @@ async function voteMessage(id, value) {
 }
 
 async function reportMessage(id) {
+  if (state.demoMode) {
+    toast("Demo report received. Real database untouched.");
+    return;
+  }
   await api(`/api/messages/${id}/report`, { method: "POST" });
   toast("Report received.");
   refreshChat(state.activeBubbleId, false);
+}
+
+function buildDemoBubbles() {
+  const now = Math.floor(Date.now() / 1000);
+  return [
+    makeDemoBubble({
+      id: "demo-transit",
+      title: "Why is the train stopped?",
+      description: "Platform 4 is packed and there has been no announcement for ten minutes.",
+      category: "Transit",
+      lat: 37.7772,
+      lng: -122.3938,
+      radius_meters: 900,
+      score: 7,
+      messages: [
+        ["Nearby Signal 18", "Conductor said signal issue near the next station.", 8],
+        ["Quiet Beacon 42", "Southbound is moving slowly but still moving.", 5],
+        ["Fresh Point 11", "Board just changed to 18 minute delay.", 4],
+      ],
+      now,
+    }),
+    makeDemoBubble({
+      id: "demo-safety",
+      title: "Smoke near 3rd street?",
+      description: "Visible smoke two blocks east, unclear if fire or construction.",
+      category: "Safety",
+      lat: 37.7755,
+      lng: -122.3951,
+      radius_meters: 700,
+      score: 4,
+      messages: [
+        ["Local Echo 07", "Fire truck just arrived, people are being moved back.", 6],
+        ["Hidden Node 31", "Looks contained to one building entrance.", 3],
+      ],
+      now,
+    }),
+    makeDemoBubble({
+      id: "demo-crowds",
+      title: "Huge queue outside the venue",
+      description: "Line wraps around the block. Trying to understand if doors opened.",
+      category: "Crowds",
+      lat: 37.7769,
+      lng: -122.396,
+      radius_meters: 500,
+      score: 3,
+      messages: [
+        ["Bright Trace 22", "Staff said doors open in 20 minutes.", 4],
+        ["Kind Voice 59", "Back of the line is now on Townsend.", 2],
+      ],
+      now,
+    }),
+  ];
+}
+
+function makeDemoBubble({ id, title, description, category, lat, lng, radius_meters, score, messages, now }) {
+  return {
+    id,
+    title,
+    description,
+    category,
+    lat,
+    lng,
+    radius_meters,
+    created_at: now - 600,
+    last_active: now - 60,
+    distance_meters: 0,
+    can_post: true,
+    message_count: messages.length,
+    score,
+    messages: messages.map(([author, text, messageScore], index) => ({
+      id: `${id}-message-${index}`,
+      author,
+      text,
+      created_at: now - 420 + index * 120,
+      score: messageScore,
+      is_mine: false,
+    })),
+  };
+}
+
+function filterDemoBubbles() {
+  return state.demoBubbles
+    .filter((bubble) => state.category === "All" || bubble.category === state.category)
+    .map((bubble) => ({
+      ...bubble,
+      distance_meters: Math.round(distanceMeters(state.coords, bubble)),
+      can_post: distanceMeters(state.coords, bubble) <= bubble.radius_meters + 75,
+      message_count: bubble.messages.length,
+    }))
+    .sort((a, b) => a.distance_meters - b.distance_meters);
+}
+
+function createDemoBubble(payload) {
+  const now = Math.floor(Date.now() / 1000);
+  const bubble = {
+    id: `demo-created-${now}`,
+    title: payload.title.trim(),
+    description: payload.description.trim(),
+    category: payload.category,
+    lat: payload.lat,
+    lng: payload.lng,
+    radius_meters: payload.radius_meters,
+    created_at: now,
+    last_active: now,
+    distance_meters: 0,
+    can_post: true,
+    message_count: 0,
+    score: 0,
+    messages: [],
+  };
+  state.demoBubbles.unshift(bubble);
+  return bubble;
+}
+
+function addDemoMessage(id, text) {
+  const bubble = state.demoBubbles.find((item) => item.id === id);
+  if (!bubble) return;
+  bubble.messages.push({
+    id: `demo-message-${Date.now()}`,
+    author: state.guest,
+    text,
+    created_at: Math.floor(Date.now() / 1000),
+    score: 0,
+    is_mine: true,
+  });
+  bubble.last_active = Math.floor(Date.now() / 1000);
+  bubble.message_count = bubble.messages.length;
 }
 
 async function api(url, options = {}) {
@@ -499,6 +662,16 @@ function toast(message) {
   els.toast.textContent = message;
   els.toast.classList.add("visible");
   window.setTimeout(() => els.toast.classList.remove("visible"), 2400);
+}
+
+function distanceMeters(a, b) {
+  const earthRadius = 6371000;
+  const p1 = (a.lat * Math.PI) / 180;
+  const p2 = (b.lat * Math.PI) / 180;
+  const dp = ((b.lat - a.lat) * Math.PI) / 180;
+  const dl = ((b.lng - a.lng) * Math.PI) / 180;
+  const h = Math.sin(dp / 2) ** 2 + Math.cos(p1) * Math.cos(p2) * Math.sin(dl / 2) ** 2;
+  return earthRadius * (2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h)));
 }
 
 function formatDistance(meters) {
