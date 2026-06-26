@@ -101,7 +101,6 @@ function bindEvents() {
   els.createButton.addEventListener("click", openCreateDialog);
   els.createFromPanel.addEventListener("click", openCreateDialog);
   els.closeCreate.addEventListener("click", closeCreateDialog);
-  els.createDialog.addEventListener("close", hideRadiusPreview);
   els.radiusInput.addEventListener("input", () => {
     els.radiusValue.textContent = els.radiusInput.value;
     updateRadiusPreview();
@@ -122,13 +121,13 @@ function bindEvents() {
 }
 
 function openCreateDialog() {
-    if (!state.coords) {
-      toast("Share location before creating a bubble.");
-      return;
-    }
-    els.createDialog.showModal();
-    showRadiusPreview();
-    els.titleInput.focus();
+  if (!state.coords) {
+    toast("Share location before creating a bubble.");
+    return;
+  }
+  els.createDialog.classList.remove("hidden");
+  showRadiusPreview();
+  els.titleInput.focus();
 }
 
 function hideDemoIfSeen() {
@@ -222,7 +221,7 @@ function updateUserMarker() {
 }
 
 function closeCreateDialog() {
-  els.createDialog.close();
+  els.createDialog.classList.add("hidden");
   hideRadiusPreview();
 }
 
@@ -264,6 +263,7 @@ function showRadiusPreview() {
   }
   state.map.on("click", handleCreateMapClick);
   updateRadiusPreview();
+  state.map.setView(latLng, Math.max(state.map.getZoom(), 16), { animate: true });
   toast("Drag the bubble pin or click the map to choose the event spot.");
 }
 
@@ -291,7 +291,7 @@ function hideRadiusPreview() {
 }
 
 function handleCreateMapClick(event) {
-  if (!els.createDialog.open) return;
+  if (els.createDialog.classList.contains("hidden")) return;
   setCreateCoords(event.latlng.lat, event.latlng.lng);
   toast("Bubble pin moved.");
 }
@@ -299,6 +299,9 @@ function handleCreateMapClick(event) {
 function setCreateCoords(lat, lng) {
   state.createCoords = { lat, lng };
   updateRadiusPreview();
+  if (state.map && !state.map.getBounds().pad(-0.25).contains([lat, lng])) {
+    state.map.panTo([lat, lng], { animate: true });
+  }
 }
 
 async function refreshBubbles() {

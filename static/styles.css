@@ -418,7 +418,6 @@ h1 {
   font-weight: 800;
 }
 
-.modal,
 .chat-modal,
 .manifesto-modal {
   border: 0;
@@ -426,13 +425,20 @@ h1 {
   background: transparent;
 }
 
-.modal::backdrop,
 .chat-modal::backdrop,
 .manifesto-modal::backdrop {
   background: rgba(16, 24, 40, 0.48);
 }
 
-.modal form {
+.create-panel {
+  position: absolute;
+  left: 24px;
+  bottom: 24px;
+  z-index: 1200;
+  width: min(420px, calc(100vw - 48px));
+}
+
+.create-panel form {
   width: min(520px, calc(100vw - 24px));
   background: #fff;
   border-radius: 18px;
@@ -755,6 +761,33 @@ textarea {
 
   .create-button strong {
     font-size: 13px;
+  }
+
+
+  .create-panel {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1800;
+    width: 100%;
+  }
+
+  .create-panel form {
+    width: 100%;
+    max-height: 48vh;
+    overflow: auto;
+    border-radius: 18px 18px 0 0;
+    padding: 14px;
+    gap: 10px;
+  }
+
+  .create-panel .modal-head h2 {
+    font-size: 18px;
+  }
+
+  .create-panel textarea {
+    min-height: 54px;
   }
 
 
