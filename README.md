@@ -29,6 +29,7 @@ The prototype is anonymous first:
 - Public bubble coordinates are blurred before they are sent back to the browser.
 - Bubbles and messages are deleted after 24 hours of inactivity.
 - Posting is allowed only while physically near the bubble radius.
+- Browsing does not require sharing location; the map viewport controls what bubbles are visible.
 
 This is not production-grade anonymity yet. For production you would still need HTTPS, stricter rate limits, abuse controls, IP retention policy decisions, and a real privacy review.
 
@@ -111,6 +112,7 @@ For a tiny MVP, the current config is enough. When traffic grows, scale the Rend
 
 - `GET /api/session`: returns anonymous guest name and category metadata.
 - `GET /api/bubbles?lat=...&lng=...&category=All`: nearby bubbles.
+- `GET /api/bubbles?north=...&south=...&east=...&west=...&category=All`: bubbles in the current map view, no user location required.
 - `POST /api/bubbles`: create a bubble at the current location.
 - `GET /api/bubbles/<id>?lat=...&lng=...`: bubble detail and messages.
 - `POST /api/bubbles/<id>/messages`: post if inside the radius.

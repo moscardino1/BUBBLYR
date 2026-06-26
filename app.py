@@ -175,9 +175,13 @@ def create_app() -> Flask:
     def list_bubbles():
         lat = parse_float(request.args.get("lat"))
         lng = parse_float(request.args.get("lng"))
+        north = parse_float(request.args.get("north"))
+        south = parse_float(request.args.get("south"))
+        east = parse_float(request.args.get("east"))
+        west = parse_float(request.args.get("west"))
         category = request.args.get("category", "All")
-        if lat is None or lng is None:
-            return jsonify({"error": "Location is required."}), 400
+        has_viewer_location = lat is not None and lng is not None
+        has_bounds = all(value is not None for value in (north, south, east, west))
 
         with app.engine.begin() as conn:
             rows = conn.execute(select(bubbles).order_by(bubbles.c.last_active.desc())).mappings().all()
@@ -185,11 +189,17 @@ def create_app() -> Flask:
             for row in rows:
                 if category != "All" and row["category"] != category:
                     continue
-                distance = haversine_meters(lat, lng, row["lat"], row["lng"])
-                if distance <= MAX_DISCOVERY_METERS:
+                if has_bounds and not is_in_bounds(row["lat"], row["lng"], north, south, east, west):
+                    continue
+                if has_viewer_location:
+                    distance = haversine_meters(lat, lng, row["lat"], row["lng"])
+                    if not has_bounds and distance > MAX_DISCOVERY_METERS:
+                        continue
                     payload.append(serialize_bubble(conn, row, lat, lng, include_preview=True))
+                elif has_bounds:
+                    payload.append(serialize_bubble(conn, row, None, None, include_preview=True))
 
-        payload.sort(key=lambda item: (item["distance_meters"], -item["score"]))
+        payload.sort(key=lambda item: (item["distance_meters"] is None, item["distance_meters"] or 0, -item["score"]))
         return jsonify({"bubbles": payload})
 
     @app.post("/api/bubbles")
@@ -231,8 +241,6 @@ def create_app() -> Flask:
     def get_bubble(bubble_id: str):
         lat = parse_float(request.args.get("lat"))
         lng = parse_float(request.args.get("lng"))
-        if lat is None or lng is None:
-            return jsonify({"error": "Location is required."}), 400
 
         with app.engine.begin() as conn:
             payload = get_bubble_payload(conn, bubble_id, lat, lng)
@@ -393,7 +401,7 @@ def save_vote(conn, target_type: str, target_id: str, value: int) -> int:
     return vote_score(conn, target_type, target_id)
 
 
-def get_bubble_payload(conn, bubble_id: str, lat: float, lng: float) -> dict | None:
+def get_bubble_payload(conn, bubble_id: str, lat: float | None, lng: float | None) -> dict | None:
     bubble = conn.execute(select(bubbles).where(bubbles.c.id == bubble_id)).mappings().first()
     if bubble is None:
         return None
@@ -403,8 +411,8 @@ def get_bubble_payload(conn, bubble_id: str, lat: float, lng: float) -> dict | N
 def serialize_bubble(
     conn,
     bubble,
-    viewer_lat: float,
-    viewer_lng: float,
+    viewer_lat: float | None,
+    viewer_lng: float | None,
     *,
     include_preview: bool = False,
     include_messages: bool = False,
@@ -414,7 +422,12 @@ def serialize_bubble(
         .mappings()
         .all()
     )
-    distance = haversine_meters(viewer_lat, viewer_lng, bubble["lat"], bubble["lng"])
+    has_viewer_location = viewer_lat is not None and viewer_lng is not None
+    distance = (
+        haversine_meters(viewer_lat, viewer_lng, bubble["lat"], bubble["lng"])
+        if has_viewer_location
+        else None
+    )
     payload = {
         "id": bubble["id"],
         "title": bubble["title"],
@@ -423,8 +436,8 @@ def serialize_bubble(
         "radius_meters": bubble["radius_meters"],
         "created_at": bubble["created_at"],
         "last_active": bubble["last_active"],
-        "distance_meters": round(distance),
-        "can_post": distance <= bubble["radius_meters"] + 75,
+        "distance_meters": round(distance) if distance is not None else None,
+        "can_post": bool(distance is not None and distance <= bubble["radius_meters"] + 75),
         "message_count": len(message_rows),
         "score": vote_score(conn, "bubble", bubble["id"]),
         "lat": blur_coord(bubble["lat"], 3),
@@ -454,6 +467,15 @@ def vote_score(conn, target_type: str, target_id: str) -> int:
         )
     ).scalar_one()
     return int(score or 0)
+
+
+def is_in_bounds(lat: float, lng: float, north: float, south: float, east: float, west: float) -> bool:
+    in_lat = south <= lat <= north
+    if west <= east:
+        in_lng = west <= lng <= east
+    else:
+        in_lng = lng >= west or lng <= east
+    return in_lat and in_lng
 
 
 def random_guest_name() -> str:
