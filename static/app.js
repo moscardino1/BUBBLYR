@@ -1,7 +1,208 @@
 const DEMO_SEEN_KEY = "bubblyr_demo_seen_v1";
+const LANGUAGE_KEY = "bubblyr_language_v1";
+
+const I18N = {
+  en: {
+    "actions.createBubble": "Create bubble",
+    "actions.exitDemo": "Exit demo",
+    "actions.recenter": "Recenter",
+    "brand.kicker": "Anonymous local awareness",
+    "brand.subbrand": "local signal, anonymous first",
+    "categories.all": "All",
+    "chat.input": "What do you see?",
+    "chat.inputMoveCloser": "Move closer to participate",
+    "chat.inputShareLocation": "Share location to participate",
+    "chat.inRange": "in range",
+    "chat.noContext": "No extra context yet.",
+    "chat.readOnly": "read only",
+    "chat.send": "Send",
+    "chat.title": "Local chat",
+    "create.categoryLabel": "Category",
+    "create.contextLabel": "Context",
+    "create.contextPlaceholder": "Platform 4, no announcement yet",
+    "create.helper": "Post one clear local question. Then move the pin if the event is not exactly where you are.",
+    "create.kicker": "Create bubble",
+    "create.panelAria": "Create bubble panel",
+    "create.placeHelper": "Drag the \"Bubble here\" pin or tap the map. The circle shows who can reply.",
+    "create.placeStep": "Place it on the map",
+    "create.questionLabel": "Question people will see",
+    "create.questionPlaceholder": "Why is the train stopped?",
+    "create.radiusLabel": "Reply radius",
+    "create.title": "Write what is happening",
+    "create.writeStep": "Write the bubble",
+    "distance.inView": "in view",
+    "empty.create": "Start a bubble",
+    "empty.demoBody": "Exit demo to use the real app.",
+    "empty.demoTitle": "Demo has no bubbles here.",
+    "empty.realBody": "Create one clear, useful question for people nearby.",
+    "empty.realTitle": "No bubbles here yet.",
+    "gate.body": "Browse public bubbles by moving the map. Share location only when you want to create or reply. The demo is isolated and never writes to the real database.",
+    "gate.demo": "Preview demo",
+    "gate.kicker": "Start here",
+    "gate.share": "Share my location",
+    "gate.title": "Find nearby bubbles",
+    "ideas.accident": "Accident nearby?",
+    "ideas.crowd": "Large crowd?",
+    "ideas.earthquake": "Earthquake?",
+    "ideas.fire": "Smoke or fire?",
+    "ideas.train": "Train blocked?",
+    "language.next": "IT",
+    "manifesto.aiBody1": "The future idea is an AI news layer running in parallel: summarizing active bubbles, grouping related reports, highlighting uncertainty, and turning many anonymous local observations into a clear public brief.",
+    "manifesto.aiBody2": "That layer is not in this free MVP yet. For now, BUBBLYR is the human signal layer: chat, proximity, voting, and ephemeral local context.",
+    "manifesto.aiTitle": "AI comes later",
+    "manifesto.kicker": "The BUBBLYR manifesto",
+    "manifesto.lead": "BUBBLYR is an experiment in local, anonymous, real-time news: people on the ground create bubbles around what they see, ask what is happening, and compare signals with others nearby.",
+    "manifesto.newBody": "A blocked train, a fire, an earthquake, a crowd, a power cut, a road closure. These are not abstract stories at first. They are local questions. BUBBLYR lets people create the event before a headline exists.",
+    "manifesto.newTitle": "The new layer is participatory",
+    "manifesto.oldBody": "News usually arrives after an event has already been filtered through platforms, feeds, institutions, incentives, and delay. But the first version of reality is often simpler: people standing near the thing, trying to understand it together.",
+    "manifesto.oldTitle": "The old model is backwards",
+    "manifesto.principle1": "Anonymous first, because reporting what you see should not require a personal brand.",
+    "manifesto.principle2": "Local first, because proximity changes what you can know.",
+    "manifesto.principle3": "Ephemeral by default, because not every local event deserves permanent storage.",
+    "manifesto.principle4": "AI as editor, not witness: humans create the signal; machines may later summarize it.",
+    "manifesto.principlesTitle": "Principles",
+    "manifesto.title": "News should start where reality happens.",
+    "map.aria": "Nearby map",
+    "metrics.activeQuestion": "Active local question",
+    "metrics.demoOnly": "demo only",
+    "metrics.messages": "{count} message{plural}",
+    "metrics.radius": "{radius}m radius",
+    "metrics.votes": "{count} votes",
+    "nav.manifesto": "Manifesto",
+    "pulse.browse": "Browse the map",
+    "pulse.closest": "{count} bubble{plural} nearby",
+    "pulse.defaultText": "Create or join a bubble to understand what is happening nearby.",
+    "pulse.demoEmpty": "Demo is empty",
+    "pulse.demoEmptyText": "Demo data only exists in this browser tab.",
+    "pulse.inView": "{count} bubble{plural} in view",
+    "pulse.mode": "Local pulse",
+    "pulse.modeDemo": "Demo mode",
+    "pulse.nearbyText": "{count} message{plural}. Closest: {title}",
+    "pulse.noBubbles": "No bubbles nearby",
+    "pulse.noBubblesText": "Start a useful local question people nearby can answer.",
+    "pulse.noLocationText": "{count} message{plural} in the current map window. Share location only if you want to post.",
+    "pulse.panText": "Pan or zoom the map to browse public bubbles. Share location only to create or reply.",
+    "toast.bubbleExpired": "That bubble expired or disappeared.",
+    "toast.bubblePinMoved": "Bubble pin moved.",
+    "toast.bubbleSelected": "Bubble selected. Double-click marker or use Open chat.",
+    "toast.demoReport": "Demo report received. Real database untouched.",
+    "toast.demoStarted": "Demo mode: no real data is being read or written.",
+    "toast.dragPin": "Drag the bubble pin or click the map to choose the event spot.",
+    "toast.locationBlocked": "Location permission was blocked.",
+    "toast.locationUnsupported": "This browser has no location support.",
+    "toast.recenterNeedsLocation": "Share location to recenter on yourself.",
+    "toast.reportReceived": "Report received.",
+    "toast.shareCreate": "Share location before creating a bubble.",
+    "toast.shareReply": "Share location to participate in a bubble.",
+    "actions.showMap": "Show on map",
+    "actions.openChat": "Open chat",
+    "message.noise": "Noise",
+    "message.report": "Report",
+    "message.useful": "Useful",
+  },
+  it: {
+    "actions.createBubble": "Crea bubble",
+    "actions.exitDemo": "Esci dalla demo",
+    "actions.recenter": "Ricentra",
+    "brand.kicker": "Consapevolezza locale anonima",
+    "brand.subbrand": "segnale locale, anonimo prima di tutto",
+    "categories.all": "Tutto",
+    "chat.input": "Cosa vedi?",
+    "chat.inputMoveCloser": "Avvicinati per partecipare",
+    "chat.inputShareLocation": "Condividi la posizione per partecipare",
+    "chat.inRange": "nel raggio",
+    "chat.noContext": "Nessun contesto aggiuntivo.",
+    "chat.readOnly": "solo lettura",
+    "chat.send": "Invia",
+    "chat.title": "Chat locale",
+    "create.categoryLabel": "Categoria",
+    "create.contextLabel": "Contesto",
+    "create.contextPlaceholder": "Binario 4, nessun annuncio per ora",
+    "create.helper": "Pubblica una domanda locale chiara. Poi sposta il pin se l'evento non e' esattamente dove sei tu.",
+    "create.kicker": "Crea bubble",
+    "create.panelAria": "Pannello per creare una bubble",
+    "create.placeHelper": "Trascina il pin \"Bubble here\" o tocca la mappa. Il cerchio mostra chi puo' rispondere.",
+    "create.placeStep": "Posizionala sulla mappa",
+    "create.questionLabel": "Domanda che vedranno le persone",
+    "create.questionPlaceholder": "Perche' il treno e' fermo?",
+    "create.radiusLabel": "Raggio risposte",
+    "create.title": "Scrivi cosa sta succedendo",
+    "create.writeStep": "Scrivi la bubble",
+    "distance.inView": "nella vista",
+    "empty.create": "Avvia una bubble",
+    "empty.demoBody": "Esci dalla demo per usare l'app reale.",
+    "empty.demoTitle": "Qui la demo non ha bubble.",
+    "empty.realBody": "Crea una domanda chiara e utile per chi e' vicino.",
+    "empty.realTitle": "Qui non ci sono ancora bubble.",
+    "gate.body": "Esplora le bubble pubbliche muovendo la mappa. Condividi la posizione solo quando vuoi creare o rispondere. La demo e' isolata e non scrive mai nel database reale.",
+    "gate.demo": "Prova demo",
+    "gate.kicker": "Inizia qui",
+    "gate.share": "Condividi posizione",
+    "gate.title": "Trova bubble vicine",
+    "ideas.accident": "Incidente vicino?",
+    "ideas.crowd": "Grande folla?",
+    "ideas.earthquake": "Terremoto?",
+    "ideas.fire": "Fumo o incendio?",
+    "ideas.train": "Treno bloccato?",
+    "language.next": "EN",
+    "manifesto.aiBody1": "L'idea futura e' un livello di news AI in parallelo: riassumere bubble attive, raggruppare segnalazioni collegate, evidenziare l'incertezza e trasformare tante osservazioni locali anonime in un brief pubblico chiaro.",
+    "manifesto.aiBody2": "Quel livello non e' ancora in questo MVP gratuito. Per ora BUBBLYR e' il livello del segnale umano: chat, prossimita', voto e contesto locale effimero.",
+    "manifesto.aiTitle": "L'AI arriva dopo",
+    "manifesto.kicker": "Il manifesto BUBBLYR",
+    "manifesto.lead": "BUBBLYR e' un esperimento di news locali, anonime e in tempo reale: le persone sul posto creano bubble intorno a cio' che vedono, chiedono cosa sta succedendo e confrontano segnali con chi e' vicino.",
+    "manifesto.newBody": "Un treno bloccato, un incendio, un terremoto, una folla, un blackout, una strada chiusa. All'inizio non sono storie astratte: sono domande locali. BUBBLYR permette alle persone di creare l'evento prima che esista un titolo.",
+    "manifesto.newTitle": "Il nuovo livello e' partecipativo",
+    "manifesto.oldBody": "Di solito le news arrivano dopo essere passate attraverso piattaforme, feed, istituzioni, incentivi e ritardi. Ma la prima versione della realta' e' spesso piu' semplice: persone vicine alla cosa che cercano di capirla insieme.",
+    "manifesto.oldTitle": "Il vecchio modello e' al contrario",
+    "manifesto.principle1": "Anonimo prima di tutto, perche' raccontare cio' che vedi non dovrebbe richiedere un personal brand.",
+    "manifesto.principle2": "Locale prima di tutto, perche' la prossimita' cambia cio' che puoi sapere.",
+    "manifesto.principle3": "Effimero di default, perche' non ogni evento locale merita memoria permanente.",
+    "manifesto.principle4": "AI come editor, non testimone: gli umani creano il segnale; le macchine potranno riassumerlo.",
+    "manifesto.principlesTitle": "Principi",
+    "manifesto.title": "Le news dovrebbero iniziare dove succede la realta'.",
+    "map.aria": "Mappa vicina",
+    "metrics.activeQuestion": "Domanda locale attiva",
+    "metrics.demoOnly": "solo demo",
+    "metrics.messages": "{count} messagg{plural}",
+    "metrics.radius": "raggio {radius}m",
+    "metrics.votes": "{count} voti",
+    "nav.manifesto": "Manifesto",
+    "pulse.browse": "Esplora la mappa",
+    "pulse.closest": "{count} bubble vicine",
+    "pulse.defaultText": "Crea o entra in una bubble per capire cosa succede vicino.",
+    "pulse.demoEmpty": "La demo e' vuota",
+    "pulse.demoEmptyText": "I dati demo esistono solo in questa scheda.",
+    "pulse.inView": "{count} bubble nella vista",
+    "pulse.mode": "Pulse locale",
+    "pulse.modeDemo": "Modalita' demo",
+    "pulse.nearbyText": "{count} messagg{plural}. Piu' vicina: {title}",
+    "pulse.noBubbles": "Nessuna bubble vicina",
+    "pulse.noBubblesText": "Avvia una domanda locale utile a cui chi e' vicino puo' rispondere.",
+    "pulse.noLocationText": "{count} messagg{plural} nella finestra della mappa. Condividi la posizione solo se vuoi postare.",
+    "pulse.panText": "Muovi o zooma la mappa per esplorare bubble pubbliche. Condividi la posizione solo per creare o rispondere.",
+    "toast.bubbleExpired": "Questa bubble e' scaduta o sparita.",
+    "toast.bubblePinMoved": "Pin della bubble spostato.",
+    "toast.bubbleSelected": "Bubble selezionata. Doppio clic sul marker oppure usa Apri chat.",
+    "toast.demoReport": "Segnalazione demo ricevuta. Database reale intatto.",
+    "toast.demoStarted": "Modalita' demo: nessun dato reale viene letto o scritto.",
+    "toast.dragPin": "Trascina il pin della bubble o clicca la mappa per scegliere il punto dell'evento.",
+    "toast.locationBlocked": "Permesso posizione bloccato.",
+    "toast.locationUnsupported": "Questo browser non supporta la posizione.",
+    "toast.recenterNeedsLocation": "Condividi la posizione per ricentrare su di te.",
+    "toast.reportReceived": "Segnalazione ricevuta.",
+    "toast.shareCreate": "Condividi la posizione prima di creare una bubble.",
+    "toast.shareReply": "Condividi la posizione per partecipare a una bubble.",
+    "actions.showMap": "Mostra sulla mappa",
+    "actions.openChat": "Apri chat",
+    "message.noise": "Rumore",
+    "message.report": "Segnala",
+    "message.useful": "Utile",
+  },
+};
 
 const state = {
   guest: "Guest",
+  lang: localStorage.getItem(LANGUAGE_KEY) === "it" ? "it" : "en",
   coords: null,
   category: "All",
   bubbles: [],
@@ -21,6 +222,7 @@ const state = {
 
 const els = {
   guestName: document.querySelector("#guestName"),
+  languageToggle: document.querySelector("#languageToggle"),
   openManifesto: document.querySelector("#openManifesto"),
   closeManifesto: document.querySelector("#closeManifesto"),
   manifestoDialog: document.querySelector("#manifestoDialog"),
@@ -62,6 +264,7 @@ init();
 async function init() {
   initMap();
   bindEvents();
+  applyTranslations();
   hideDemoIfSeen();
 
   const session = await api("/api/session");
@@ -86,6 +289,7 @@ function initMap() {
 }
 
 function bindEvents() {
+  els.languageToggle.addEventListener("click", toggleLanguage);
   els.openManifesto.addEventListener("click", () => els.manifestoDialog.showModal());
   els.closeManifesto.addEventListener("click", () => els.manifestoDialog.close());
   els.enableLocation.addEventListener("click", requestLocation);
@@ -93,7 +297,7 @@ function bindEvents() {
   els.exitDemo.addEventListener("click", exitDemoMode);
   els.recenterMap.addEventListener("click", () => {
     if (!state.coords) {
-      toast("Share location to recenter on yourself.");
+      toast(t("toast.recenterNeedsLocation"));
       return;
     }
     state.map.setView([state.coords.lat, state.coords.lng], 15);
@@ -120,9 +324,81 @@ function bindEvents() {
   els.bubbleDown.addEventListener("click", () => voteBubble("down"));
 }
 
+function toggleLanguage() {
+  state.lang = state.lang === "en" ? "it" : "en";
+  localStorage.setItem(LANGUAGE_KEY, state.lang);
+  applyTranslations();
+  renderPulse();
+  renderBubbles();
+  if (state.activeBubbleId) refreshChat(state.activeBubbleId, false);
+}
+
+function applyTranslations() {
+  document.documentElement.lang = state.lang;
+  document.querySelectorAll("[data-i18n]").forEach((node) => {
+    node.textContent = t(node.dataset.i18n);
+  });
+  document.querySelectorAll("[data-i18n-placeholder]").forEach((node) => {
+    node.placeholder = t(node.dataset.i18nPlaceholder);
+  });
+  document.querySelectorAll("[data-i18n-aria-label]").forEach((node) => {
+    node.setAttribute("aria-label", t(node.dataset.i18nAriaLabel));
+  });
+  els.languageToggle.textContent = t("language.next");
+  els.languageToggle.setAttribute("aria-label", state.lang === "en" ? "Passa all'italiano" : "Switch to English");
+  renderCategoryControls();
+  updateCreatePinLanguage();
+}
+
+function renderCategoryControls() {
+  document.querySelectorAll("[data-category]").forEach((node) => {
+    const key = node.dataset.category;
+    if (key === "All") {
+      node.textContent = t("categories.all");
+      return;
+    }
+    const category = categoryMeta(key);
+    node.textContent = categoryLabel(category);
+  });
+  Array.from(els.categoryInput.options).forEach((option) => {
+    const category = categoryMeta(option.value);
+    option.textContent = `${categoryLabel(category)} - ${categoryPrompt(category)}`;
+  });
+}
+
+function t(key, params = {}) {
+  let value = I18N[state.lang]?.[key] || I18N.en[key] || key;
+  Object.entries(params).forEach(([name, replacement]) => {
+    value = value.replaceAll(`{${name}}`, replacement);
+  });
+  return value;
+}
+
+function plural(count, singular = "", pluralSuffix = "s") {
+  if (state.lang === "it" && singular === "" && pluralSuffix === "s") {
+    return count === 1 ? "o" : "i";
+  }
+  return count === 1 ? singular : pluralSuffix;
+}
+
+function createPinIcon() {
+  return L.divIcon({
+    className: "create-pin",
+    html: `<div class="create-pin-label">${escapeHtml(state.lang === "it" ? "Bubble qui" : "Bubble here")}</div><div class="create-pin-inner"></div>`,
+    iconSize: [96, 62],
+    iconAnchor: [48, 58],
+  });
+}
+
+function updateCreatePinLanguage() {
+  if (!state.createPin) return;
+  state.createPin.setIcon(createPinIcon());
+  state.createPin.getTooltip()?.setContent(state.lang === "it" ? "Trascinami o clicca la mappa" : "Drag me or click the map");
+}
+
 function openCreateDialog() {
   if (!state.coords) {
-    toast("Share location before creating a bubble.");
+    toast(t("toast.shareCreate"));
     return;
   }
   els.createDialog.classList.remove("hidden");
@@ -140,7 +416,7 @@ function requestLocation() {
   localStorage.setItem(DEMO_SEEN_KEY, "1");
   els.demoLocation.classList.add("hidden");
   if (!navigator.geolocation) {
-    toast("This browser has no location support.");
+    toast(t("toast.locationUnsupported"));
     return;
   }
 
@@ -152,7 +428,7 @@ function requestLocation() {
         lng: position.coords.longitude,
       });
     },
-    () => toast("Location permission was blocked."),
+    () => toast(t("toast.locationBlocked")),
     { enableHighAccuracy: true, timeout: 10000, maximumAge: 10000 },
   );
 }
@@ -163,7 +439,7 @@ function startDemoMode() {
   state.demoBubbles = buildDemoBubbles();
   els.exitDemo.classList.remove("hidden");
   els.demoLocation.classList.add("hidden");
-  setLocation({ lat: 37.7764, lng: -122.3948 }, "Demo mode: no real data is being read or written.");
+  setLocation({ lat: 37.7764, lng: -122.3948 }, t("toast.demoStarted"));
 }
 
 function exitDemoMode() {
@@ -243,14 +519,9 @@ function showRadiusPreview() {
   if (!state.createPin) {
     state.createPin = L.marker(latLng, {
       draggable: true,
-      icon: L.divIcon({
-        className: "create-pin",
-        html: `<div class="create-pin-label">Bubble here</div><div class="create-pin-inner"></div>`,
-        iconSize: [96, 62],
-        iconAnchor: [48, 58],
-      }),
+      icon: createPinIcon(),
     }).addTo(state.map);
-    state.createPin.bindTooltip("Drag me or click the map", {
+    state.createPin.bindTooltip(state.lang === "it" ? "Trascinami o clicca la mappa" : "Drag me or click the map", {
       direction: "top",
       offset: [0, -44],
       permanent: false,
@@ -259,12 +530,12 @@ function showRadiusPreview() {
       const pos = state.createPin.getLatLng();
       setCreateCoords(pos.lat, pos.lng);
     });
-    state.createPin.on("dragend", () => toast("Bubble pin moved."));
+    state.createPin.on("dragend", () => toast(t("toast.bubblePinMoved")));
   }
   state.map.on("click", handleCreateMapClick);
   updateRadiusPreview();
   state.map.setView(latLng, Math.max(state.map.getZoom(), 16), { animate: true });
-  toast("Drag the bubble pin or click the map to choose the event spot.");
+  toast(t("toast.dragPin"));
 }
 
 function updateRadiusPreview() {
@@ -293,7 +564,7 @@ function hideRadiusPreview() {
 function handleCreateMapClick(event) {
   if (els.createDialog.classList.contains("hidden")) return;
   setCreateCoords(event.latlng.lat, event.latlng.lng);
-  toast("Bubble pin moved.");
+  toast(t("toast.bubblePinMoved"));
 }
 
 function setCreateCoords(lat, lng) {
@@ -327,34 +598,36 @@ async function refreshBubbles() {
 function renderPulse() {
   const count = state.bubbles.length;
   const messages = state.bubbles.reduce((total, bubble) => total + bubble.message_count, 0);
-  els.modeLabel.textContent = state.demoMode ? "Demo mode" : "Local pulse";
+  els.modeLabel.textContent = state.demoMode ? t("pulse.modeDemo") : t("pulse.mode");
 
   if (!state.coords) {
-    els.pulseTitle.textContent = count ? `${count} bubble${count === 1 ? "" : "s"} in view` : "Browse the map";
+    els.pulseTitle.textContent = count
+      ? t("pulse.inView", { count, plural: plural(count) })
+      : t("pulse.browse");
     els.pulseText.textContent = count
-      ? `${messages} message${messages === 1 ? "" : "s"} in the current map window. Share location only if you want to post.`
-      : "Pan or zoom the map to browse public bubbles. Share location only to create or reply.";
+      ? t("pulse.noLocationText", { count: messages, plural: plural(messages) })
+      : t("pulse.panText");
     return;
   }
   if (!count) {
-    els.pulseTitle.textContent = state.demoMode ? "Demo is empty" : "No bubbles nearby";
+    els.pulseTitle.textContent = state.demoMode ? t("pulse.demoEmpty") : t("pulse.noBubbles");
     els.pulseText.textContent = state.demoMode
-      ? "Demo data only exists in this browser tab."
-      : "Start a useful local question people nearby can answer.";
+      ? t("pulse.demoEmptyText")
+      : t("pulse.noBubblesText");
     return;
   }
   const top = state.bubbles[0];
-  els.pulseTitle.textContent = `${count} bubble${count === 1 ? "" : "s"} nearby`;
-  els.pulseText.textContent = `${messages} message${messages === 1 ? "" : "s"}. Closest: ${top.title}`;
+  els.pulseTitle.textContent = t("pulse.closest", { count, plural: plural(count) });
+  els.pulseText.textContent = t("pulse.nearbyText", { count: messages, plural: plural(messages), title: top.title });
 }
 
 function renderBubbles() {
   if (!state.bubbles.length) {
     els.bubbleList.innerHTML = `
       <div class="empty">
-        <strong>${state.demoMode ? "Demo has no bubbles here." : "No bubbles here yet."}</strong>
-        <span>${state.demoMode ? "Exit demo to use the real app." : "Create one clear, useful question for people nearby."}</span>
-        ${state.coords ? '<button type="button" data-create-empty>Start a bubble</button>' : ""}
+        <strong>${state.demoMode ? t("empty.demoTitle") : t("empty.realTitle")}</strong>
+        <span>${state.demoMode ? t("empty.demoBody") : t("empty.realBody")}</span>
+        ${state.coords ? `<button type="button" data-create-empty>${t("empty.create")}</button>` : ""}
       </div>
     `;
     const createButton = els.bubbleList.querySelector("[data-create-empty]");
@@ -364,26 +637,26 @@ function renderBubbles() {
 
   els.bubbleList.innerHTML = state.bubbles
     .map((bubble) => {
-      const category = window.BUBBLYR_CATEGORIES[bubble.category] || window.BUBBLYR_CATEGORIES.General;
+      const category = categoryMeta(bubble.category);
       return `
         <article class="bubble-card ${state.selectedBubbleId === bubble.id ? "selected" : ""}">
           <button class="bubble-main" type="button" data-open-bubble="${bubble.id}">
             <div class="bubble-row">
-              <span class="badge" style="background:${category.color}">${escapeHtml(category.label)}</span>
+              <span class="badge" style="background:${category.color}">${escapeHtml(categoryLabel(category))}</span>
               <span class="metrics">${formatDistance(bubble.distance_meters)}</span>
             </div>
             <div class="bubble-title">${escapeHtml(bubble.title)}</div>
-            <p class="bubble-text">${escapeHtml(bubble.description || bubble.latest_message || "Active local question")}</p>
+            <p class="bubble-text">${escapeHtml(bubble.description || bubble.latest_message || t("metrics.activeQuestion"))}</p>
             <div class="metrics">
-              <span>${bubble.message_count} messages</span>
-              <span>${bubble.score} votes</span>
-              <span>${bubble.radius_meters}m radius</span>
-              ${state.demoMode ? "<span>demo only</span>" : ""}
+              <span>${t("metrics.messages", { count: bubble.message_count, plural: plural(bubble.message_count) })}</span>
+              <span>${t("metrics.votes", { count: bubble.score })}</span>
+              <span>${t("metrics.radius", { radius: bubble.radius_meters })}</span>
+              ${state.demoMode ? `<span>${t("metrics.demoOnly")}</span>` : ""}
             </div>
           </button>
           <div class="card-actions">
-            <button type="button" data-focus-bubble="${bubble.id}">Show on map</button>
-            <button type="button" data-open-bubble="${bubble.id}">Open chat</button>
+            <button type="button" data-focus-bubble="${bubble.id}">${t("actions.showMap")}</button>
+            <button type="button" data-open-bubble="${bubble.id}">${t("actions.openChat")}</button>
           </div>
         </article>
       `;
@@ -475,13 +748,13 @@ function focusBubble(id, fromMap = false) {
   if (entry) entry.pip.openTooltip();
   renderBubbles();
   renderMarkers();
-  if (fromMap) toast("Bubble selected. Double-click marker or use Open chat.");
+  if (fromMap) toast(t("toast.bubbleSelected"));
 }
 
 async function createBubble(event) {
   event.preventDefault();
   if (!state.coords) {
-    toast("Share location before creating a bubble.");
+    toast(t("toast.shareCreate"));
     return;
   }
   const payload = {
@@ -538,7 +811,7 @@ async function refreshChat(id, scroll) {
       state.activeBubbleId = null;
       state.selectedBubbleId = null;
       if (els.chatDialog.open) closeChat();
-      toast("That bubble expired or disappeared.");
+      toast(t("toast.bubbleExpired"));
       refreshBubbles();
       return;
     }
@@ -546,15 +819,15 @@ async function refreshChat(id, scroll) {
   if (!bubble) return;
 
   els.chatTitle.textContent = bubble.title;
-  els.chatMeta.textContent = `${bubble.category} · ${formatDistance(bubble.distance_meters)} · ${bubble.can_post ? "in range" : "read only"}${state.demoMode ? " · demo" : ""}`;
+  els.chatMeta.textContent = `${categoryLabel(categoryMeta(bubble.category))} · ${formatDistance(bubble.distance_meters)} · ${bubble.can_post ? t("chat.inRange") : t("chat.readOnly")}${state.demoMode ? ` · ${t("metrics.demoOnly")}` : ""}`;
   els.bubbleScore.textContent = bubble.score;
   els.messageInput.disabled = !bubble.can_post;
   els.messageInput.placeholder = state.coords
-    ? bubble.can_post ? "What do you see?" : "Move closer to participate"
-    : "Share location to participate";
+    ? bubble.can_post ? t("chat.input") : t("chat.inputMoveCloser")
+    : t("chat.inputShareLocation");
 
   els.chatMessages.innerHTML = `
-    <div class="empty">${escapeHtml(bubble.description || "No extra context yet.")}</div>
+    <div class="empty">${escapeHtml(bubble.description || t("chat.noContext"))}</div>
     ${bubble.messages.map(renderMessage).join("")}
   `;
 
@@ -573,13 +846,13 @@ function renderMessage(message) {
     <div class="message ${message.is_mine ? "mine" : ""}">
       <div class="message-meta">
         <span>${escapeHtml(message.author)} · ${formatTime(message.created_at)}</span>
-        <span>${message.score} votes</span>
+        <span>${t("metrics.votes", { count: message.score })}</span>
       </div>
       <div class="message-body">${escapeHtml(message.text)}</div>
       <div class="message-actions">
-        <button type="button" data-message-vote="${message.id}" data-value="up">Useful</button>
-        <button type="button" data-message-vote="${message.id}" data-value="down">Noise</button>
-        ${message.is_mine ? "" : `<button type="button" data-report="${message.id}">Report</button>`}
+        <button type="button" data-message-vote="${message.id}" data-value="up">${t("message.useful")}</button>
+        <button type="button" data-message-vote="${message.id}" data-value="down">${t("message.noise")}</button>
+        ${message.is_mine ? "" : `<button type="button" data-report="${message.id}">${t("message.report")}</button>`}
       </div>
     </div>
   `;
@@ -589,7 +862,7 @@ async function sendMessage(event) {
   event.preventDefault();
   if (!els.messageInput.value.trim() || !state.activeBubbleId) return;
   if (!state.demoMode && !state.coords) {
-    toast("Share location to participate in a bubble.");
+    toast(t("toast.shareReply"));
     return;
   }
 
@@ -647,11 +920,11 @@ async function voteMessage(id, value) {
 
 async function reportMessage(id) {
   if (state.demoMode) {
-    toast("Demo report received. Real database untouched.");
+    toast(t("toast.demoReport"));
     return;
   }
   await api(`/api/messages/${id}/report`, { method: "POST" });
-  toast("Report received.");
+  toast(t("toast.reportReceived"));
   refreshChat(state.activeBubbleId, false);
 }
 
@@ -784,6 +1057,18 @@ function addDemoMessage(id, text) {
   bubble.message_count = bubble.messages.length;
 }
 
+function categoryMeta(key) {
+  return window.BUBBLYR_CATEGORIES[key] || window.BUBBLYR_CATEGORIES.General;
+}
+
+function categoryLabel(category) {
+  return state.lang === "it" ? category.label_it || category.label : category.label;
+}
+
+function categoryPrompt(category) {
+  return state.lang === "it" ? category.prompt_it || category.prompt : category.prompt;
+}
+
 async function api(url, options = {}) {
   const response = await fetch(url, {
     headers: { "Content-Type": "application/json" },
@@ -791,7 +1076,7 @@ async function api(url, options = {}) {
   });
   const data = await response.json();
   if (!response.ok) {
-    throw new Error(data.error || "Request failed.");
+    throw new Error(data.error || (state.lang === "it" ? "Richiesta non riuscita." : "Request failed."));
   }
   return data;
 }
@@ -839,7 +1124,7 @@ function distanceMeters(a, b) {
 }
 
 function formatDistance(meters) {
-  if (meters === null || meters === undefined) return "in view";
+  if (meters === null || meters === undefined) return t("distance.inView");
   if (meters < 1000) return `${Math.round(meters)}m`;
   return `${(meters / 1000).toFixed(1)}km`;
 }

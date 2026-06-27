@@ -11,12 +11,13 @@
     <div class="shell">
       <header class="topbar">
         <div>
-          <p class="kicker">Anonymous local awareness</p>
+          <p class="kicker" data-i18n="brand.kicker">Anonymous local awareness</p>
           <h1>BUBBLYR</h1>
-          <p class="subbrand">local signal, anonymous first</p>
+          <p class="subbrand" data-i18n="brand.subbrand">local signal, anonymous first</p>
         </div>
         <div class="top-actions">
-          <button id="openManifesto" class="text-button" type="button">Manifesto</button>
+          <button id="languageToggle" class="text-button language-toggle" type="button" aria-label="Switch language">IT</button>
+          <button id="openManifesto" class="text-button" type="button" data-i18n="nav.manifesto">Manifesto</button>
           <div class="identity">
             <span class="status-dot"></span>
             <span id="guestName">Guest</span>
@@ -25,26 +26,26 @@
       </header>
 
       <main class="layout">
-        <section class="map-panel" aria-label="Nearby map">
+        <section class="map-panel" aria-label="Nearby map" data-i18n-aria-label="map.aria">
           <div id="map"></div>
           <div id="locationGate" class="location-gate">
-            <p class="kicker">Start here</p>
-            <h2>Find nearby bubbles</h2>
-            <p>Browse public bubbles by moving the map. Share location only when you want to create or reply. The demo is isolated and never writes to the real database.</p>
+            <p class="kicker" data-i18n="gate.kicker">Start here</p>
+            <h2 data-i18n="gate.title">Find nearby bubbles</h2>
+            <p data-i18n="gate.body">Browse public bubbles by moving the map. Share location only when you want to create or reply. The demo is isolated and never writes to the real database.</p>
             <div class="location-actions">
-              <button id="enableLocation">Share my location</button>
-              <button id="demoLocation" class="secondary-button">Preview demo</button>
+              <button id="enableLocation" data-i18n="gate.share">Share my location</button>
+              <button id="demoLocation" class="secondary-button" data-i18n="gate.demo">Preview demo</button>
             </div>
           </div>
-          <button id="createButton" class="create-button" aria-label="Create bubble">
+          <button id="createButton" class="create-button" aria-label="Create bubble" data-i18n-aria-label="actions.createBubble">
             <span>+</span>
-            <strong>Create bubble</strong>
+            <strong data-i18n="actions.createBubble">Create bubble</strong>
           </button>
         </section>
 
         <section class="side-panel">
           <div class="filters" id="filters">
-            <button class="filter active" data-category="All">All</button>
+            <button class="filter active" data-category="All" data-i18n="categories.all">All</button>
             {% for key, category in categories.items() %}
             <button class="filter" data-category="{{ key }}">{{ category.label }}</button>
             {% endfor %}
@@ -52,23 +53,23 @@
 
           <div class="pulse">
             <div>
-              <p class="kicker" id="modeLabel">Local pulse</p>
-              <h2 id="pulseTitle">Browse the map</h2>
+              <p class="kicker" id="modeLabel" data-i18n="pulse.mode">Local pulse</p>
+              <h2 id="pulseTitle" data-i18n="pulse.browse">Browse the map</h2>
             </div>
-            <p id="pulseText">Create or join a bubble to understand what is happening nearby.</p>
+            <p id="pulseText" data-i18n="pulse.defaultText">Create or join a bubble to understand what is happening nearby.</p>
             <div class="pulse-actions">
-              <button id="createFromPanel" class="primary small-action" type="button">Create bubble</button>
-              <button id="exitDemo" class="secondary-button hidden" type="button">Exit demo</button>
-              <button id="recenterMap" class="secondary-button" type="button">Recenter</button>
+              <button id="createFromPanel" class="primary small-action" type="button" data-i18n="actions.createBubble">Create bubble</button>
+              <button id="exitDemo" class="secondary-button hidden" type="button" data-i18n="actions.exitDemo">Exit demo</button>
+              <button id="recenterMap" class="secondary-button" type="button" data-i18n="actions.recenter">Recenter</button>
             </div>
           </div>
 
           <div class="idea-strip">
-            <span>Train blocked?</span>
-            <span>Accident nearby?</span>
-            <span>Earthquake?</span>
-            <span>Smoke or fire?</span>
-            <span>Large crowd?</span>
+            <span data-i18n="ideas.train">Train blocked?</span>
+            <span data-i18n="ideas.accident">Accident nearby?</span>
+            <span data-i18n="ideas.earthquake">Earthquake?</span>
+            <span data-i18n="ideas.fire">Smoke or fire?</span>
+            <span data-i18n="ideas.crowd">Large crowd?</span>
           </div>
 
           <div id="bubbleList" class="bubble-list"></div>
@@ -76,14 +77,14 @@
       </main>
     </div>
 
-    <section id="createDialog" class="create-panel hidden" aria-label="Create bubble panel">
+    <section id="createDialog" class="create-panel hidden" aria-label="Create bubble panel" data-i18n-aria-label="create.panelAria">
       <form id="createForm" class="create-form">
         <div class="sheet-handle" aria-hidden="true"></div>
         <div class="modal-head create-head">
           <div>
-            <p class="kicker">Create bubble</p>
-            <h2>Write what is happening</h2>
-            <p class="create-helper">Post one clear local question. Then move the pin if the event is not exactly where you are.</p>
+            <p class="kicker" data-i18n="create.kicker">Create bubble</p>
+            <h2 data-i18n="create.title">Write what is happening</h2>
+            <p class="create-helper" data-i18n="create.helper">Post one clear local question. Then move the pin if the event is not exactly where you are.</p>
           </div>
           <button type="button" class="icon-button" id="closeCreate">x</button>
         </div>
@@ -91,21 +92,21 @@
         <div class="create-step write-step">
           <div class="create-step-title">
             <span>1</span>
-            <strong>Write the bubble</strong>
+            <strong data-i18n="create.writeStep">Write the bubble</strong>
           </div>
 
           <label>
-            Question people will see
-            <input id="titleInput" maxlength="80" placeholder="Why is the train stopped?" required>
+            <span data-i18n="create.questionLabel">Question people will see</span>
+            <input id="titleInput" maxlength="80" placeholder="Why is the train stopped?" data-i18n-placeholder="create.questionPlaceholder" required>
           </label>
 
           <label>
-            Context
-            <textarea id="descriptionInput" maxlength="220" rows="3" placeholder="Platform 4, no announcement yet"></textarea>
+            <span data-i18n="create.contextLabel">Context</span>
+            <textarea id="descriptionInput" maxlength="220" rows="3" placeholder="Platform 4, no announcement yet" data-i18n-placeholder="create.contextPlaceholder"></textarea>
           </label>
 
           <label>
-            Category
+            <span data-i18n="create.categoryLabel">Category</span>
             <select id="categoryInput" required>
               {% for key, category in categories.items() %}
               <option value="{{ key }}">{{ category.label }} - {{ category.prompt }}</option>
@@ -117,16 +118,16 @@
         <div class="create-step place-step">
           <div class="create-step-title">
             <span>2</span>
-            <strong>Place it on the map</strong>
+            <strong data-i18n="create.placeStep">Place it on the map</strong>
           </div>
-          <p>Drag the "Bubble here" pin or tap the map. The circle shows who can reply.</p>
+          <p data-i18n="create.placeHelper">Drag the "Bubble here" pin or tap the map. The circle shows who can reply.</p>
           <label>
-            Reply radius <strong><span id="radiusValue">600</span>m</strong>
+            <span><span data-i18n="create.radiusLabel">Reply radius</span> <strong><span id="radiusValue">600</span>m</strong></span>
             <input id="radiusInput" type="range" min="100" max="2000" step="100" value="600">
           </label>
         </div>
 
-        <button class="primary create-submit" type="submit">Create bubble</button>
+        <button class="primary create-submit" type="submit" data-i18n="actions.createBubble">Create bubble</button>
       </form>
     </section>
 
@@ -136,7 +137,7 @@
           <button type="button" class="icon-button" id="closeChat">‹</button>
           <div>
             <p class="kicker" id="chatMeta">Bubble</p>
-            <h2 id="chatTitle">Local chat</h2>
+            <h2 id="chatTitle" data-i18n="chat.title">Local chat</h2>
           </div>
           <div class="vote-box">
             <button type="button" id="bubbleUp">▲</button>
@@ -148,8 +149,8 @@
         <div id="chatMessages" class="messages"></div>
 
         <form id="messageForm" class="message-form">
-          <input id="messageInput" maxlength="400" placeholder="What do you see?">
-          <button type="submit">Send</button>
+          <input id="messageInput" maxlength="400" placeholder="What do you see?" data-i18n-placeholder="chat.input">
+          <button type="submit" data-i18n="chat.send">Send</button>
         </form>
       </div>
     </dialog>
@@ -158,48 +159,48 @@
       <article class="manifesto">
         <header class="manifesto-head">
           <div>
-            <p class="kicker">The BUBBLYR manifesto</p>
-            <h2>News should start where reality happens.</h2>
+            <p class="kicker" data-i18n="manifesto.kicker">The BUBBLYR manifesto</p>
+            <h2 data-i18n="manifesto.title">News should start where reality happens.</h2>
           </div>
           <button type="button" class="icon-button" id="closeManifesto">x</button>
         </header>
 
         <div class="manifesto-body">
           <p class="lead">
-            BUBBLYR is an experiment in local, anonymous, real-time news: people on the ground create bubbles around what they see, ask what is happening, and compare signals with others nearby.
+            <span data-i18n="manifesto.lead">BUBBLYR is an experiment in local, anonymous, real-time news: people on the ground create bubbles around what they see, ask what is happening, and compare signals with others nearby.</span>
           </p>
 
           <section>
-            <h3>The old model is backwards</h3>
-            <p>
+            <h3 data-i18n="manifesto.oldTitle">The old model is backwards</h3>
+            <p data-i18n="manifesto.oldBody">
               News usually arrives after an event has already been filtered through platforms, feeds, institutions, incentives, and delay. But the first version of reality is often simpler: people standing near the thing, trying to understand it together.
             </p>
           </section>
 
           <section>
-            <h3>The new layer is participatory</h3>
-            <p>
+            <h3 data-i18n="manifesto.newTitle">The new layer is participatory</h3>
+            <p data-i18n="manifesto.newBody">
               A blocked train, a fire, an earthquake, a crowd, a power cut, a road closure. These are not abstract stories at first. They are local questions. BUBBLYR lets people create the event before a headline exists.
             </p>
           </section>
 
           <section>
-            <h3>AI comes later</h3>
-            <p>
+            <h3 data-i18n="manifesto.aiTitle">AI comes later</h3>
+            <p data-i18n="manifesto.aiBody1">
               The future idea is an AI news layer running in parallel: summarizing active bubbles, grouping related reports, highlighting uncertainty, and turning many anonymous local observations into a clear public brief.
             </p>
-            <p>
+            <p data-i18n="manifesto.aiBody2">
               That layer is not in this free MVP yet. For now, BUBBLYR is the human signal layer: chat, proximity, voting, and ephemeral local context.
             </p>
           </section>
 
           <section>
-            <h3>Principles</h3>
+            <h3 data-i18n="manifesto.principlesTitle">Principles</h3>
             <ul>
-              <li>Anonymous first, because reporting what you see should not require a personal brand.</li>
-              <li>Local first, because proximity changes what you can know.</li>
-              <li>Ephemeral by default, because not every local event deserves permanent storage.</li>
-              <li>AI as editor, not witness: humans create the signal; machines may later summarize it.</li>
+              <li data-i18n="manifesto.principle1">Anonymous first, because reporting what you see should not require a personal brand.</li>
+              <li data-i18n="manifesto.principle2">Local first, because proximity changes what you can know.</li>
+              <li data-i18n="manifesto.principle3">Ephemeral by default, because not every local event deserves permanent storage.</li>
+              <li data-i18n="manifesto.principle4">AI as editor, not witness: humans create the signal; machines may later summarize it.</li>
             </ul>
           </section>
         </div>

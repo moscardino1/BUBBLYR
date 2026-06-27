@@ -113,6 +113,11 @@ h1 {
   font-weight: 850;
 }
 
+.language-toggle {
+  min-width: 44px;
+  text-align: center;
+}
+
 .status-dot {
   width: 9px;
   height: 9px;

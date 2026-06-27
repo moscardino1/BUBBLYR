@@ -37,32 +37,44 @@ SESSION_COOKIE_MAX_AGE = 8 * 60 * 60
 CATEGORIES = {
     "Transit": {
         "label": "Transit",
+        "label_it": "Trasporti",
         "prompt": "Trains, buses, traffic, airport, road closures",
+        "prompt_it": "Treni, bus, traffico, aeroporto, strade chiuse",
         "color": "#f59e0b",
     },
     "Safety": {
         "label": "Safety",
+        "label_it": "Sicurezza",
         "prompt": "Accidents, fire, police, medical help, unsafe areas",
+        "prompt_it": "Incidenti, incendi, polizia, soccorsi, zone poco sicure",
         "color": "#ef4444",
     },
     "Weather": {
         "label": "Weather",
+        "label_it": "Meteo",
         "prompt": "Earthquake, storm, smoke, flood, unusual weather",
+        "prompt_it": "Terremoti, temporali, fumo, allagamenti, meteo insolito",
         "color": "#14b8a6",
     },
     "Utilities": {
         "label": "Utilities",
+        "label_it": "Servizi",
         "prompt": "Power, water, internet, buildings, public services",
+        "prompt_it": "Luce, acqua, internet, edifici, servizi pubblici",
         "color": "#6366f1",
     },
     "Crowds": {
         "label": "Crowds",
+        "label_it": "Folla",
         "prompt": "Queues, events, protests, noise, unusual gatherings",
+        "prompt_it": "Code, eventi, proteste, rumore, assembramenti insoliti",
         "color": "#a855f7",
     },
     "General": {
         "label": "General",
+        "label_it": "Generale",
         "prompt": "Anything nearby people should understand quickly",
+        "prompt_it": "Qualsiasi cosa vicina che le persone dovrebbero capire subito",
         "color": "#2563eb",
     },
 }
